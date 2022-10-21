@@ -1,0 +1,235 @@
+workers:
+  sim-cards-info-db-updater:
+    command: python workers/plintron_csv.py
+    scale: 1
+    queue: plintron_new_csv_upload
+
+  telegram-message-sender:
+    command: python workers/telegram_send_message.py
+    scale: 1
+    queue: telegram_send_message
+
+services:
+
+  tenants:
+    active: true
+    prefix: ${API_PREFIX}/tenants
+    port: 9100
+
+  documents:
+    active: true
+    prefix: ${API_PREFIX}/documents
+    port: 9101
+    storage: ${STORAGE_FOLDER}
+
+  flows:
+    active: true
+    prefix: ${API_PREFIX}/flows
+    port: 9102
+
+  sendmail:
+    active: true
+    prefix: ${API_PREFIX}/sendmail
+    port: 9103
+
+    profiles:
+
+      sendinblue_smtp:
+      
+        sender: digital@digitalcube.rs
+        smtp_relay: smtp-relay.sendinblue.com
+        smtp_port: 587
+        username: igor@digitalcube.rs
+        password: TvNDd20yMpIbXfzh
+        authenticated: true
+
+      sendinblue_telmekom_smtp:
+        sender: dont-reply@impresa.bz
+        username: 'marketing@telmekom.com'
+        password: 'Sz2AbEs4RMGOjDnw'
+        smtp_relay: 'smtp-relay.sendinblue.com'
+        smtp_port: 587
+
+      sendgrid_telmekom_smtp:
+        sender: dont-reply@impresa.bz
+        authenticated: true
+        password: "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"
+        username: 'apikey'
+        smtp_relay: 'smtp.sendgrid.net'
+        smtp_port: 587
+
+      smtp:
+        smtp_relay: '10.200.51.81'
+        smtp_relay_port: 25
+
+
+  sms:
+    active: true
+    prefix: ${API_PREFIX}/sms
+    port: 9104
+
+    defult_profile: sms2email # smsapi
+
+    profiles:
+      smsapi:
+        default_sender: ${SMS_DEFAULT_SENDER}
+        endpoint: https:/${API_PREFIX}.smsapi.com/sms.do
+        api_key: ${SMS_TOKEN}
+
+      anysms:
+        endpoint: https://www.any-sms.biz/gateway/send_sms.php
+        uid: 200992
+        password: 3xwqxuj1
+        gateway: 20
+
+      sms2email:
+        endpoint: igor@digitalcube.rs
+
+  notifications:
+    active: true
+    prefix: ${API_PREFIX}/notifications
+    port: 9104
+
+  tickets:
+    active: true
+    prefix: ${API_PREFIX}/tickets
+    port: 9106
+
+    ombis:
+      user: "WebService"
+      password: "Omb!Rest#"
+
+
+
+  bp:
+    active: true
+    prefix: ${API_PREFIX}/bp
+    port: 9107
+
+  absences:
+    active: true
+    prefix: ${API_PREFIX}/absences
+    port: 9112
+
+  bookmarks:
+    active: true
+    prefix: ${API_PREFIX}/bookmarks
+    port: 9114
+
+  todos:
+    active: true
+    prefix: ${API_PREFIX}/todos
+    port: 9115
+
+  wiki:
+    active: true
+    prefix: ${API_PREFIX}/wiki
+    port: 9117
+
+  base:
+    active: true
+    prefix: ${API_PREFIX}/base
+    port: 9118
+
+    api-keys:
+      '1ca8a9cb-2eaa-4c74-86ad-eda66f64bdc8':
+        tenant_code: DCUBE
+        tenant_username: system
+
+      'bb8f306e-6458-4484-bc96-d4e538a135e4':
+        tenant_code: TELMEKOM
+        tenant_username: system
+
+
+  kanban:
+    active: true
+    prefix: ${API_PREFIX}/kanban
+    port: 9120
+
+  teamcalendar:
+    active: true
+    prefix: ${API_PREFIX}/teamcalendar
+    port: 9121
+
+  sla:
+    active: true
+    prefix: ${API_PREFIX}/sla
+    port: 9124
+
+  coverage:
+    active: true
+    prefix: ${API_PREFIX}/coverage
+    port: 9125
+
+  open_messenger:
+    active: false
+    prefix: ${API_PREFIX}/open_messenger
+    port: 9126
+
+    profiles:
+      smsapi:
+        endpoint: https://us.sms.api.sinch.com/xms/v1/76e380f16571491fb4a1b98efa85b8b1/batches
+        api_key: 2c0ccc2165b74fccbc6e38203b11d6a0
+
+  telegram:
+    active: true
+    prefix: ${API_PREFIX}/telegram
+    port: 9127
+
+  pdf_generator:
+    active: true
+    prefix: ${API_PREFIX}/pdf_generator
+    port: 9129
+
+  pdf_sign:
+    active: true
+    prefix: ${API_PREFIX}/pdf_sign
+    port: 9130
+
+  files:
+    active: true
+    prefix: ${API_PREFIX}/files
+    port: 9131
+
+  services:
+    active: true
+    prefix: ${API_PREFIX}/services
+    port: 9132
+
+  remote_logger:
+    active: true
+    prefix: ${API_PREFIX}/remote_logger
+    port: 9133
+
+  wallet:
+    active: true
+    prefix: ${API_PREFIX}/wallet
+    port: 9134
+
+  plintron_mock:
+    active: true
+    prefix: ${API_PREFIX}/plintron_mock
+    port: 9135
+
+  geoloc:
+    active: true
+    prefix: ${API_PREFIX}/geoloc
+    port: 9136
+
+  id_recognition:
+    active: true
+    prefix: ${API_PREFIX}/id_recognition
+    port: 9137
+
+  conferences:
+    active: true
+    prefix: ${API_PREFIX}/conferences
+    port: 9138
+
+  deals:
+    active: true
+    prefix: ${API_PREFIX}/deals
+    port: 9139
+
+
+  # {{ new_service }}{# TEMPLATE PLACEHOLDER. DO NOT DELETE #}

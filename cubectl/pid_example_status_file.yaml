@@ -1,0 +1,12 @@
+services:
+  tenants:
+    system_data:
+      pid: 11
+    service_data:
+      port: 9000
+  kanban:
+    system_data:
+      pid: 12
+    service_data:
+      port: 9001
+
