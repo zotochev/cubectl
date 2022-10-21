@@ -1,4 +1,5 @@
 from time import sleep
+import dotenv
 
 from cubectl.src.service_process.service_process import ServiceProcess
 from cubectl.src.executor.executor import Executor
@@ -21,31 +22,30 @@ def observe(check_period: int = 1):
 
 def main():
     """
-
     name: Optional[str]
-    command: Path
+    command: str
     environment: dict[str, str] = dict()  # list of env variables
     env_files: list[str] = list()         # list of env files
     dotenv: bool = True                   # if true (default true) tries to load .env file near command file
     service: bool = True                  # if true (default false) assigns port and nginx config
     """
-    init_config = {
-        'name': 'test_process',
-        # 'command': 'python cubectl/src/example_services/example_service_0.py',
-        'command': 'python src/example_services/example_service_0.py',
-    }
-    # pr = ServiceProcess(init_config=init_config)
-    # print(pr.status().dict())
-    # sleep(1)
-    # pr.restart()
-    # sleep(1)
-    # print(pr.status().dict())
-    # sleep(3)
-    from subprocess import Popen
 
-    a = Popen(init_config['command'].split())
-    sleep(0.1)
-    print(a.poll())
+    init_config_ok = {
+        'name': 'test_process',
+        # 'command': 'python cubectl/tests/example_services/example_service_0.py',
+
+        'executor': 'python',
+        'file': 'cubectl/tests/example_services/example_service_0.py',
+        'arguments': {'--name': 'new_name'},
+        'dotenv': True,
+        'environment': {'TWO': 'TWO2'},
+        'env_files': ['cubectl/tests/example_services/environments/local.env']
+    }
+
+    pr = ServiceProcess(init_config=init_config_ok)
+    pr.start()
+    sleep(5)
+    pr.stop()
 
 
 if __name__ == '__main__':

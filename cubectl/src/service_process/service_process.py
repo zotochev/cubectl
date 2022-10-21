@@ -1,7 +1,13 @@
 import os
+import io
 from subprocess import Popen
 from typing import Optional
 from time import sleep
+from datetime import datetime
+import logging
+from pathlib import Path
+
+import dotenv
 
 from src.models import InitProcessConfig
 from src.models import ProcessState
@@ -10,18 +16,40 @@ from src.models import SystemData
 from src.models import ServiceData
 
 
-WAIT_TIME_TO_START_UP = 0.1
+OS_OPERATIONS_DELAY = 0.1
+log = logging.getLogger(__file__)
 
 
 class ServiceProcess:
     def __init__(self, init_config: dict):
         self._init_config = InitProcessConfig(**init_config)
+        self._start_up_command: list[str] = self._create_start_up_command()
         self._process: Optional[Popen] = None
         self._state = ProcessState.stopped
+        self._process_started_at = None
+        self._process_stopped_at = None
+
+        self._resolve_env()
 
         if self._init_config.service:
             # todo
+            #   choose port
+            #   create nginx config
             pass
+
+    def _create_start_up_command(self):
+        if self._init_config.command is not None:
+            log.warning(
+                f'{__file__}: Use executor, arguments '
+                f'and file fields instead command.'
+            )
+            return self._init_config.command.split()
+        else:
+            executor = self._init_config.executor
+            file = self._init_config.file
+            args = self._init_config.arguments
+            args = ' '.join([f'{k} {v}' for k, v in args.items()])
+            return f'{executor} {file} {args}'.split()
 
     def start(self):
         self._check_process()
@@ -29,13 +57,15 @@ class ServiceProcess:
             return
 
         self._process = Popen(
-            self._init_config.command.split(),
+            self._start_up_command,
             env=self._resolve_env()
         )
 
         self._check_process()
         if self._state is not ProcessState.started:
             self._state = ProcessState.failed_start_loop
+        else:
+            self._process_started_at = datetime.now()
 
     def status(self) -> ProcessStatus:
         """
@@ -57,6 +87,13 @@ class ServiceProcess:
     @property
     def state(self):
         return self._state
+
+    @property
+    def name(self):
+        return self._init_config.name
+
+    def is_service(self):
+        return self._init_config.service
 
     def _status_collect_system_data(self) -> SystemData:
         """
@@ -87,12 +124,15 @@ class ServiceProcess:
 
     def _check_process(self):
         error_code = -555
-        sleep(WAIT_TIME_TO_START_UP)
+        sleep(OS_OPERATIONS_DELAY)
 
         if self._process is not None:
             error_code = self._process.poll()
 
         if error_code is not None:
+            self._process_stopped_at = datetime.now()
+
+            self._process_started_at = None
             if self._state is not ProcessState.failed_start_loop:
                 self._state = ProcessState.stopped
         else:
@@ -100,12 +140,33 @@ class ServiceProcess:
         return error_code
 
     def stop(self):
-        self._process.kill()
+        if self.state is not ProcessState.stopped:
+            if self._process is not None:
+                self._process.kill()
         self._check_process()
 
     def restart(self):
         self.stop()
         self.start()
+
+    def _apply_env_files(self):
+        env_files = self._init_config.env_files
+        if self._init_config.dotenv:
+            env_files = [
+                *env_files,
+                str(Path(Path(self._init_config.file).parent, '.env'))
+            ]
+        env_vars = ''
+
+        for env_file in env_files:
+            try:
+                with open(env_file) as f:
+                    env_vars += f.read() + '\n'
+            except Exception as e:
+                log.error(str(e))
+
+        variables_stream = io.StringIO(env_vars)
+        dotenv.load_dotenv(stream=variables_stream)
 
     def _resolve_env(self) -> dict:
         """
@@ -119,8 +180,16 @@ class ServiceProcess:
         and set them up to result dict
         """
 
-        _ = self
+        # if self._init_config.dotenv:
+        #     self._apply_env_dotenv()
+        if self._init_config.env_files:
+            self._apply_env_files()
+
         result = os.environ.copy()
+
+        if self._init_config.environment:
+            for k, v in self._init_config.environment.items():
+                result[k] = v
         return result
 
     def _compare_status_init_config(self, desired_status: InitProcessConfig) -> bool:
@@ -128,12 +197,14 @@ class ServiceProcess:
         Compares desired_status with current state of process and if not
         replaces init file with new one.
 
+        todo:
+            compare env (also check inside files)
+
         Returns:
             True if desired_status is same as current
             False in other case
         """
 
-        # todo compare env (also files)
         desired_status = desired_status.dict()
         current_status = self._init_config.copy().dict()
         not_found = '__not_found__'
@@ -141,13 +212,20 @@ class ServiceProcess:
         for key, value in desired_status.items():
             current_value = current_status.get(key, not_found)
             if value != current_value and current_value != not_found:
-                not_changed = {k: v for k, v in current_value if k not in desired_status}
-                self._init_config = InitProcessConfig(
-                    **desired_status,
-                    **not_changed       # note: ???
-                )
                 return False
         return True
+
+    def _make_follow_updated_init(self, desired_status: InitProcessConfig):
+
+        desired_status = desired_status.dict()
+        current_status = self._init_config.copy().dict()
+        not_changed = {k: v for k, v in current_status.items() if k not in desired_status}
+
+        self._init_config = InitProcessConfig(
+            **desired_status,
+            **not_changed       # note: ???
+        )
+        self._start_up_command = self._create_start_up_command()
 
     def _compare_status_service_data(self, desired_status: ServiceData) -> bool:
         """
@@ -156,19 +234,45 @@ class ServiceProcess:
         _ = self
         return True
 
+    def _make_follow_service_data(self, desired_status: ServiceData):
+        pass
+
     def _compare_status_system_data(self, desired_status: SystemData) -> bool:
         """
         'system_data': {'error_code': None, 'pid': 363868, 'state': 'STARTED'}
         """
         return desired_status.state is self.state
 
-    def _compare_status(self, desired_status: ProcessStatus):
-        if not all((
-            self._compare_status_init_config(desired_status=desired_status.init_config),
-            self._compare_status_system_data(desired_status=desired_status.system_data),
-            self._compare_status_service_data(desired_status=desired_status.service_data),
-        )):
-            pass
+    def _make_to_follow_state(self, state: ProcessState):
+        factory = {
+            ProcessState.started: self.start,
+            ProcessState.stopped: self.stop
+        }
+        factory[state]()
+
+    def _make_to_follow_system_data(self, desired_status: SystemData):
+        """
+        Handle restart in this function if needed
+        """
+        self._make_to_follow_state(desired_status.state)
+
+    def apply_status(self, desired_status: ProcessStatus):
+        to_restart = False
+
+        if not self._compare_status_init_config(desired_status.init_config):
+            to_restart = True
+            self._make_follow_updated_init(desired_status.init_config)
+
+        if not self._compare_status_service_data(desired_status.service_data):
+            to_restart = True
+            self._make_follow_service_data(desired_status.service_data)
+
+        if to_restart:
+            self.restart()
+
+        if not self._compare_status_system_data(desired_status.system_data):
+            # usually no need to restart
+            self._make_to_follow_system_data(desired_status.system_data)
 
     def get_logs(self):
         raise NotImplemented('service_process.py')

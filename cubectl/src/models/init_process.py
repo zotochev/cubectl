@@ -9,7 +9,12 @@ __all__ = [
 
 class InitProcessConfig(BaseModel):
     name: Optional[str]
-    command: str
+    command: Optional[str]                # deprecated
+
+    executor: str = 'python'
+    file: Optional[str]                   # cubectl/tests/example_services/example_service_0.py'
+    arguments: Optional[dict]              # {'--name': 'new_name'}
+
     environment: dict[str, str] = dict()  # list of env variables
     env_files: list[str] = list()         # list of env files
     dotenv: bool = True                   # if true (default true) tries to load .env file near command file
