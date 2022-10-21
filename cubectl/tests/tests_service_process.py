@@ -1,7 +1,8 @@
 import unittest
+from pprint import pprint
 
 from cubectl.src.models import ProcessState
-from cubectl.src.models import InitProcessConfig
+from cubectl.src.models import ProcessStatus
 from cubectl.src.service_process.service_process import ServiceProcess
 
 
@@ -18,13 +19,10 @@ class TestBasic(unittest.TestCase):
 
     def test_start_stop_process(self):
         pr = ServiceProcess(init_config=self.init_config_ok)
-        # status_before = pr.state
         self.assertEqual(pr.state, ProcessState.stopped)
         pr.start()
-        # status_before = pr.status()
         self.assertEqual(pr.state, ProcessState.started)
         pr.stop()
-        # status_after = pr.status()
         self.assertEqual(pr.state, ProcessState.stopped)
 
     def test_try_start_not_existing(self):
@@ -43,14 +41,15 @@ class TestBasic(unittest.TestCase):
         self.assertNotEqual(pid_before, pid_after)
 
     def test_compare_status(self):
-        desired_status = {
-            'state': str(ProcessState.started)
-        }
-        # desired_status = None
+        desired_status = ProcessStatus(
+            init_config=self.init_config_ok,
+            # service_data={}
+            system_data={'state': ProcessState.started}
+        )
 
         pr = ServiceProcess(init_config=self.init_config_ok)
         pr.start()
         status = pr.status().dict()
-        status.pop('init_config')
-        print(status)
+        # status.pop('init_config')
+        pprint(status)
         pr.stop()

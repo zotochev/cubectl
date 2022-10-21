@@ -1,3 +1,4 @@
+import os
 from subprocess import Popen
 from typing import Optional
 from time import sleep
@@ -18,19 +19,23 @@ class ServiceProcess:
         self._process: Optional[Popen] = None
         self._state = ProcessState.stopped
 
-        # self.start()
+        if self._init_config.service:
+            # todo
+            pass
 
     def start(self):
         self._check_process()
         if self._state is ProcessState.started:
             return
 
-        self._process = Popen(self._init_config.command.split())
+        self._process = Popen(
+            self._init_config.command.split(),
+            env=self._resolve_env()
+        )
 
         self._check_process()
         if self._state is not ProcessState.started:
             self._state = ProcessState.failed_start_loop
-            # raise Exception('Process failed to start')
 
     def status(self) -> ProcessStatus:
         """
@@ -39,14 +44,6 @@ class ServiceProcess:
         init_config: InitProcessConfig
         """
 
-        error_code = self._check_process()
-
-        # return ProcessStatus(
-        #     state=self._state,
-        #     error_code=error_code,
-        #     pid=self._process.pid if self._process is not None else None,
-        #     init_config=self._init_config
-        # )
         return ProcessStatus(
             system_data=self._status_collect_system_data(),
             service_data=self._status_collect_service_data(),
@@ -68,11 +65,12 @@ class ServiceProcess:
         error_code: Optional[int]
         """
         _ = self
+        error_code = self._check_process()
 
         return SystemData(
             pid=self.pid,
             state=self._state,
-            error_code=self._check_process(),
+            error_code=error_code,
         )
 
     def _status_collect_service_data(self) -> ServiceData:
@@ -109,8 +107,68 @@ class ServiceProcess:
         self.stop()
         self.start()
 
-    def _compare_status(self, desired_status: dict):
-        raise NotImplemented('service_process.py')
+    def _resolve_env(self) -> dict:
+        """
+        Add env variables from env files.
+
+        get env vars from:
+            'dotenv': True,
+            'env_files': [],
+            'environment': {},
+
+        and set them up to result dict
+        """
+
+        _ = self
+        result = os.environ.copy()
+        return result
+
+    def _compare_status_init_config(self, desired_status: InitProcessConfig) -> bool:
+        """
+        Compares desired_status with current state of process and if not
+        replaces init file with new one.
+
+        Returns:
+            True if desired_status is same as current
+            False in other case
+        """
+
+        # todo compare env (also files)
+        desired_status = desired_status.dict()
+        current_status = self._init_config.copy().dict()
+        not_found = '__not_found__'
+
+        for key, value in desired_status.items():
+            current_value = current_status.get(key, not_found)
+            if value != current_value and current_value != not_found:
+                not_changed = {k: v for k, v in current_value if k not in desired_status}
+                self._init_config = InitProcessConfig(
+                    **desired_status,
+                    **not_changed       # note: ???
+                )
+                return False
+        return True
+
+    def _compare_status_service_data(self, desired_status: ServiceData) -> bool:
+        """
+        'service_data': {'nginx_config': '', 'port': 123456789},
+        """
+        _ = self
+        return True
+
+    def _compare_status_system_data(self, desired_status: SystemData) -> bool:
+        """
+        'system_data': {'error_code': None, 'pid': 363868, 'state': 'STARTED'}
+        """
+        return desired_status.state is self.state
+
+    def _compare_status(self, desired_status: ProcessStatus):
+        if not all((
+            self._compare_status_init_config(desired_status=desired_status.init_config),
+            self._compare_status_system_data(desired_status=desired_status.system_data),
+            self._compare_status_service_data(desired_status=desired_status.service_data),
+        )):
+            pass
 
     def get_logs(self):
         raise NotImplemented('service_process.py')
