@@ -49,7 +49,7 @@ class ServiceProcess:
             file = self._init_config.file
             args = self._init_config.arguments
             args = ' '.join([f'{k} {v}' for k, v in args.items()])
-            return f'{executor} {file} {args}'.split()
+            return [x for x in f'{executor} {file} {args}'.split() if x]
 
     def start(self):
         self._check_process()

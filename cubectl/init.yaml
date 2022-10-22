@@ -1,18 +1,38 @@
-set_up_commands: []
-tear_down_commands: []
+set_up_commands: []       # not implemented
+tear_down_commands: []    # not implemented
 
 
 # There are two types of processes:
 #   service: requires port and nginx config
 #   worker (service: false): only starts up
 
+# location of this file is used to resolve all path-strings in this file
+# if root_dir is not specified
+# root_dir should be absolut (starts from /) otherwise it ignored
+root_dir: null
+
+# todo
+#   to start up
+#   nginx cofig
+
+# do not use enegan dev
+
+
 processes:
   - name: service_0
+
     command: 'python src/example_services/example_service_0.py'
+
+    executor: 'python',
+    file: 'cubectl/tests/example_services/example_service_0.py',
+    arguments:
+      '--name': 'new_name'
+
     environment:        # object of env variables
       FOO: 'BAR'
     env-files: []       # list of env files
     dotenv: false       # if true (default true) tries to load .env file near command file
+
     service: true       # if true (default false) assigns port and nginx config
 
   - name: service_1
