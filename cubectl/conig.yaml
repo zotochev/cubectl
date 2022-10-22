@@ -1,6 +1,6 @@
-root: './'
+applications_register: '/tmp/cubectl_applications_register.yaml'
 
-status_file_location: './'
+status_file_location: '/tmp'
 
 
 configurator: ''

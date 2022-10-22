@@ -1,3 +1,5 @@
+installation_name: enegan
+
 set_up_commands: []       # not implemented
 tear_down_commands: []    # not implemented
 
@@ -6,9 +8,8 @@ tear_down_commands: []    # not implemented
 #   service: requires port and nginx config
 #   worker (service: false): only starts up
 
-# location of this file is used to resolve all path-strings in this file
-# if root_dir is not specified
-# root_dir should be absolut (starts from /) otherwise it ignored
+# if `root_dir: null` location of this file is assumed as root directory
+# root_dir should be absolut (starts from eg: `/home/admin`)
 root_dir: null
 
 # todo

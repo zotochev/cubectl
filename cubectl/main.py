@@ -20,6 +20,22 @@ def observe(check_period: int = 1):
         sleep(check_period)
 
 
+def init(init_file: str):
+    """
+    Registers application in cubectl_application_register.yaml
+    Creates status file out of init_file.
+    Saves application info to /tmp/cubectl.yaml
+    """
+    pass
+
+
+def status():
+    """
+    Shows running applications. If there are more than one.
+    /tmp/cubectl_applications.yaml
+    """
+
+
 def main():
     """
     name: Optional[str]
@@ -42,10 +58,10 @@ def main():
         'env_files': ['cubectl/tests/example_services/environments/local.env']
     }
 
-    pr = ServiceProcess(init_config=init_config_ok)
-    pr.start()
-    sleep(5)
-    pr.stop()
+    # pr = ServiceProcess(init_config=init_config_ok)
+    # pr.start()
+    # sleep(5)
+    # pr.stop()
 
 
 if __name__ == '__main__':

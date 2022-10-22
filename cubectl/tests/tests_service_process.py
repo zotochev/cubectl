@@ -1,4 +1,3 @@
-import datetime
 import unittest
 from pprint import pprint
 
@@ -7,12 +6,12 @@ from cubectl.src.models import ProcessStatus
 from cubectl.src.service_process.service_process import ServiceProcess
 
 
-class TestBasic(unittest.TestCase):
+class TestServiceProcessBasic(unittest.TestCase):
     init_config_ok = {
         'name': 'test_process',
         # 'command': 'python example_services/example_service_0.py',
         'executor': 'python',
-        'file': 'example_services/example_service_0.py',
+        'file': 'assets/example_services/example_service_0.py',
         'arguments': {'--name': 'new_name'}
     }
 
@@ -98,4 +97,10 @@ class TestBasic(unittest.TestCase):
 
         pr.apply_status(desired_status=desired_status)
         self.assertEqual(pr.state, ProcessState.stopped)
+        pr.stop()
+
+    def test_print_status(self):
+        pr = ServiceProcess(init_config=self.init_config_ok)
+        pr.start()
+        pprint(pr.status().dict())
         pr.stop()

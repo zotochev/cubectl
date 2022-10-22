@@ -1,21 +1,18 @@
 class Configurator:
     """
+    Inits status file.
     Opens status file and sets it in requested state.
     """
 
-    def __init__(self, services: list, status_file: str):
-        self._services = services
-        self._status_file = self._read_file(status_file)
+    def __init__(self, config_file: str):
+        pass
 
-    @staticmethod
-    def _read_file(status_file: str):
+    def init(self, init_file: str):
         """
-        Reads status file (yaml) to dict
-        :param status_file:
-        :return:
+        todo:
+            * create status file out of init file
         """
-
-        return dict()
+        pass
 
     def start(self):
         """

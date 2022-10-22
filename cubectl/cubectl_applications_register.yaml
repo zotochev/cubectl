@@ -1,0 +1,3 @@
+enegan:
+  status_file: /tmp/enegan_status_file.yaml
+  init_file: /home/admin/init.yaml
