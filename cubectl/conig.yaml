@@ -1,7 +1,3 @@
 applications_register: '/tmp/cubectl_applications_register.yaml'
 
-status_file_location: '/tmp'
-
-
-configurator: ''
-executor: ''
+default_status_files_dir: '/tmp'

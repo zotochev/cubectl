@@ -1,0 +1,6 @@
+new_init_app:
+  init_file: /tmp/init.yaml
+  status_file: /tmp/status_file.yaml
+new_init_app_0:
+  init_file: /tmp/init_0.yaml
+  status_file: /tmp/status_file_0.yaml

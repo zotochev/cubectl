@@ -1,32 +1,41 @@
 from time import sleep
 import dotenv
+from pathlib import Path
+
+from . import register_location, read_yaml
+from src.initialization_functions import register_application, create_status_file
 
 from cubectl.src.service_process.service_process import ServiceProcess
 from cubectl.src.executor.executor import Executor
 from cubectl.src.configurator.configurator import Configurator
+from src.models.init_application import InitFileModel
 
 
-def configure(services: list):
-    c = Configurator(services=services, status_file='')
+# def configure(services: list):
+#     c = None
 
 
-def observe(check_period: int = 1):
-    e = Executor()
-
-    while True:
-        status_file = dict()
-        e.update(status_file=status_file)
-
-        sleep(check_period)
+# def observe(check_period: int = 1):
+#     e = Executor()
+#
+#     while True:
+#         status_file = dict()
+#         e.update(status_file=status_file)
+#
+#         sleep(check_period)
 
 
 def init(init_file: str):
     """
     Registers application in cubectl_application_register.yaml
     Creates status file out of init_file.
-    Saves application info to /tmp/cubectl.yaml
+
     """
-    pass
+    init_config: InitFileModel = read_yaml(
+        init_file, validation_model=InitFileModel
+    )
+    register_application(init_config=init_config)
+    create_status_file(init_config=init_config)
 
 
 def status():
