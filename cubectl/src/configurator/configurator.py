@@ -1,13 +1,14 @@
 import yaml
 from pathlib import Path
 import logging
+from functools import reduce
 
-# from cubectl import register_location
+from cubectl import config
 from src.utils import resolve_path, read_yaml
 from src.initialization_functions import register_application
 from src.initialization_functions import create_status_object
 
-from src.models import InitFileModel, ProcessState
+from src.models import InitFileModel, ProcessState, ServiceData
 
 
 log = logging.getLogger(__file__)
@@ -25,19 +26,44 @@ class Configurator:
         self._config = config
         self._app_register = config.get('applications_register', '/tmp/cubectl_application_register.yaml')
 
-    def _get_app_register(self, app_name: str) -> dict:
+    def _get_register(self) -> dict:
         register = Path(self._app_register).resolve()
         if not register.is_file():
             raise Exception('cubectl: No register found.')
+
         with register.open() as f:
             register_dict: dict = yaml.load(f, Loader=yaml.FullLoader)
             if not register_dict:
                 raise Exception('cubectl: Register is empty.')
 
+        return register_dict
+
+    def _get_app_register(self, app_name: str) -> dict:
+        register_dict = self._get_register()
+
         try:
             return register_dict[app_name]
         except Exception:
             return list(register_dict.values())[0]
+
+    def _get_all_allocated_ports_by_app(self):
+        register = self._get_register()
+        ports_by_app = dict()
+
+        for app_name in register.keys():
+            try:
+                status = self._get_status(app_name)
+            except FileNotFoundError:
+                continue
+            services = status.get('services', [])
+            ports = []
+            for service in services:
+                service_data = service['service_data']
+                if not service_data:
+                    continue
+                ports.append(service_data['port'])
+            ports_by_app[app_name] = ports
+        return ports_by_app
 
     def _get_status(self, app_name: str):
         register = self._get_app_register(app_name=app_name)
@@ -45,6 +71,32 @@ class Configurator:
 
         with status_file.open() as f:
             return yaml.load(f, Loader=yaml.FullLoader)
+
+    def _assign_ports_to_services(self, status):
+        ports_by_app = self._get_all_allocated_ports_by_app()
+        allocated_ports = []
+        if not ports_by_app:
+            pass
+        elif len(ports_by_app) == 1:
+            if list(ports_by_app.values()):
+                allocated_ports = list(ports_by_app.values())[0]
+        else:
+            allocated_ports = reduce(
+                lambda x, y: [*x, *y], list(ports_by_app.values())
+            )
+
+        if allocated_ports:
+            port = max(allocated_ports)
+        else:
+            port = config.get('init_port_number', 9300)
+
+        for service in status.services:
+            # service: ProcessStatus
+            if service.init_config.service:
+                port += 1
+                allocated_ports.append(port)
+                service.service_data.port = port
+        return status
 
     def init(self, init_file: str, reinit: bool = False):
         """
@@ -71,6 +123,7 @@ class Configurator:
         status_object = create_status_object(
             init_config=init_config.dict(),
         )
+        status_object = self._assign_ports_to_services(status=status_object)
 
         status_file = Path(status_file)
         if status_file.is_dir():

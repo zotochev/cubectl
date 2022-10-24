@@ -74,6 +74,12 @@ def init_service_status(root_dir, process_init_config: InitProcessConfig):
     file = resolve_path(
         root_dir=root_dir, file_path=process_init_config.file, return_dir=False
     )
+    if not Path(file).is_file():
+        raise Exception(
+            f'cubectl: application_registration: command: '
+            f'{process_init_config.executor} {file} '
+            f'is not executable.'
+        )
     process_init_config.file = file
     env_files = process_init_config.env_files
     process_init_config.env_files = [
@@ -81,11 +87,12 @@ def init_service_status(root_dir, process_init_config: InitProcessConfig):
         for x in env_files
     ]
 
-    service_data = None     # ServiceData()
-
     system_data = SystemData(
         state=ProcessState.stopped
     )
+    service_data = None
+    if process_init_config.service:
+        service_data = ServiceData(port=9000)
 
     return ProcessStatus(
         init_config=process_init_config,

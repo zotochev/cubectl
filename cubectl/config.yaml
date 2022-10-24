@@ -2,3 +2,6 @@
 applications_register: '/home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/cubectl_applications_register.yaml'
 
 default_status_files_dir: '/tmp'
+
+# port from which ports assigning starts
+init_port_number: 9300

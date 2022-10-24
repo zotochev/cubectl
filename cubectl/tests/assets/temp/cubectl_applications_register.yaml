@@ -1,2 +1,4 @@
 enegan:
   status_file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/enegan_status_file.yaml
+not_enegan:
+  status_file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/not_enegan_status_file.yaml

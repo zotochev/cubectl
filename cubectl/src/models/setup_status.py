@@ -31,7 +31,7 @@ class SystemData(BaseModel):
 
 class ServiceData(BaseModel):
     port: int
-    nginx_config: str
+    nginx_config: Optional[str]
 
 
 class ProcessStatus(BaseModel):

@@ -6,7 +6,7 @@ from src.configurator import Configurator
 from src.executor import Executor
 
 from cubectl import config, register_location
-from src.utils import resolve_path
+from src.utils import resolve_path, get_status_file, create_nginx_config
 
 
 configurator = Configurator(config)
@@ -63,28 +63,29 @@ def status(app_name: str, services: tuple):
 @cli.command('watch')
 @click.argument('app_name', default='default')
 def watch(app_name):
-    with Path(register_location).open() as f:
-        register: dict = yaml.load(f, Loader=yaml.Loader)
-
-    if not register:
-        raise Exception(
-            'cubectl: no applications registered (register is empty)'
-        )
-    elif app_name == 'default':
-        # fixme change register from dict to list
-        #   dicts are not ordered and getting first element is impossible
-
-        status_file = list(register.values())[0]['status_file']
-    elif app_name not in register:
-        raise Exception(
-            f'cubectl: application {app_name} not found in register. '
-            f'Try to call cubectl init before.'
-        )
-    else:
-        status_file = register[app_name]['status_file']
+    status_file = get_status_file(
+        app_name=app_name, register_location=register_location
+    )
 
     e = Executor(status_file)
     e.process()
+
+
+@cli.command('setup-nginx')
+@click.argument('app_name', default='default')
+def setup_nginx(app_name):
+    status_file = get_status_file(
+        app_name=app_name, register_location=register_location
+    )
+    services = [
+        x for x in status_file.get('services', [])
+        if x['init_config']['service']
+    ]
+
+    if not services:
+        raise Exception('cubectl: no services found in status file.')
+
+    nginx_config = create_nginx_config()
 
 
 if __name__ == '__main__':
