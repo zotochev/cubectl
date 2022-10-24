@@ -30,8 +30,8 @@ class SystemData(BaseModel):
 
 
 class ServiceData(BaseModel):
-    port: Optional[int]
-    nginx_config: Optional[str]
+    port: int
+    nginx_config: str
 
 
 class ProcessStatus(BaseModel):
@@ -40,5 +40,9 @@ class ProcessStatus(BaseModel):
     init_config: InitProcessConfig
 
 
+JobName = str
+
+
 class SetupStatus(BaseModel):
-    services: Optional[list[ProcessStatus]]
+    jobs: dict[JobName, InitProcessConfig] = dict()
+    services: list[ProcessStatus] = list()

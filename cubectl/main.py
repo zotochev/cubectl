@@ -1,28 +1,16 @@
 from time import sleep
 import dotenv
 from pathlib import Path
+from typing import Optional
 
-from . import register_location, read_yaml
-from src.initialization_functions import register_application, create_status_file
+import yaml
 
-from cubectl.src.service_process.service_process import ServiceProcess
-from cubectl.src.executor.executor import Executor
-from cubectl.src.configurator.configurator import Configurator
-from src.models.init_application import InitFileModel
+from . import register_location
+from src.utils import resolve_path, read_yaml
+from src.initialization_functions import register_application
+from src.initialization_functions import create_status_object
 
-
-# def configure(services: list):
-#     c = None
-
-
-# def observe(check_period: int = 1):
-#     e = Executor()
-#
-#     while True:
-#         status_file = dict()
-#         e.update(status_file=status_file)
-#
-#         sleep(check_period)
+from src.models import InitFileModel
 
 
 def init(init_file: str):
@@ -34,8 +22,19 @@ def init(init_file: str):
     init_config: InitFileModel = read_yaml(
         init_file, validation_model=InitFileModel
     )
-    register_application(init_config=init_config)
-    create_status_file(init_config=init_config)
+    root_dir = init_config.root_dir if init_config.root_dir else Path(init_file).parent
+    init_config.root_dir = root_dir
+    status_file = resolve_path(
+        root_dir=root_dir, file_path=init_config.status_file
+    )
+
+    register_application(init_config=init_config.dict())
+    status_object = create_status_object(
+        init_config=init_config.dict(),
+    )
+
+    with open(status_file, 'w') as f:
+        yaml.dump(status_object.dict(), f)
 
 
 def status():
