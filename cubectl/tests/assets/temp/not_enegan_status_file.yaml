@@ -9,11 +9,11 @@ services:
       FOO: BAR
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
-    name: service_0
+    name: service_3
     service: true
   service_data:
     nginx_config: null
-    port: 9304
+    port: 9312
   system_data:
     error_code: null
     pid: null
@@ -27,11 +27,11 @@ services:
       FOO: BAR
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
-    name: service_1
+    name: service_4
     service: true
   service_data:
     nginx_config: null
-    port: 9305
+    port: 9313
   system_data:
     error_code: null
     pid: null

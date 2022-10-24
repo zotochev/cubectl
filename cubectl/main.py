@@ -1,3 +1,5 @@
+import os
+
 import click
 import yaml
 from pathlib import Path
@@ -5,8 +7,16 @@ from pathlib import Path
 from src.configurator import Configurator
 from src.executor import Executor
 
-from cubectl import config, register_location
-from src.utils import resolve_path, get_status_file, create_nginx_config
+from src import config, register_location
+from src.utils import (
+    resolve_path,
+    get_status_file,
+    create_nginx_config,
+    get_all_allocated_ports_by_app,
+    read_yaml,
+    check_service_names_for_duplicates,
+    check_if_launched_as_root,
+)
 
 
 configurator = Configurator(config)
@@ -72,20 +82,49 @@ def watch(app_name):
 
 
 @cli.command('setup-nginx')
+@click.option('--apply', default=False, is_flag=True)
 @click.argument('app_name', default='default')
-def setup_nginx(app_name):
+def setup_nginx(app_name, apply):
+    if apply and not check_if_launched_as_root():
+        raise Exception('cubectl: setup-nginx: to apply run as the root user.')
+
     status_file = get_status_file(
         app_name=app_name, register_location=register_location
     )
+    status = read_yaml(status_file)
     services = [
-        x for x in status_file.get('services', [])
+        x for x in status.get('services', [])
         if x['init_config']['service']
     ]
 
     if not services:
         raise Exception('cubectl: no services found in status file.')
 
-    nginx_config = create_nginx_config()
+    register = read_yaml(register_location)
+    ports_by_app = get_all_allocated_ports_by_app(register)
+    check_service_names_for_duplicates(ports_by_app)
+
+    ports_by_service = dict()
+    for service_ports in ports_by_app.values():
+        for service_name, port in service_ports.items():
+            ports_by_service[port] = ports_by_service.get(port, [])
+            ports_by_service[port].append(service_name)
+
+    nginx_config = create_nginx_config(ports_by_service)
+
+    nginx_config_file = f'cubectl_{app_name}'
+    if check_if_launched_as_root():
+        nginx_config_file = '/etc/nginx/sites-available/' + nginx_config_file
+
+    with Path(nginx_config_file).open('w') as f:
+        print('writing to ', nginx_config_file)
+        f.write(nginx_config)
+
+    if apply:
+        os.symlink(
+            nginx_config_file,
+            nginx_config_file.replace('sites-available', 'sites-enabled')
+        )
 
 
 if __name__ == '__main__':

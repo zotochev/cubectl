@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 from functools import reduce
 
-from cubectl import config
+from src import config
 from src.utils import resolve_path, read_yaml
 from src.initialization_functions import register_application
 from src.initialization_functions import create_status_object
@@ -91,11 +91,13 @@ class Configurator:
             port = config.get('init_port_number', 9300)
 
         for service in status.services:
-            # service: ProcessStatus
+            # service: InitProcessConfig
             if service.init_config.service:
-                port += 1
-                allocated_ports.append(port)
-                service.service_data.port = port
+                service.service_data.port = service.init_config.port
+                if service.init_config.port is None:
+                    port += 1
+                    allocated_ports.append(port)
+                    service.service_data.port = port
         return status
 
     def init(self, init_file: str, reinit: bool = False):

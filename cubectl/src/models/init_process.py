@@ -19,3 +19,4 @@ class InitProcessConfig(BaseModel):
     env_files: list[str] = list()         # list of env files
     dotenv: bool = True                   # if true (default true) tries to load .env file near command file
     service: bool = True                  # if true (default false) assigns port and nginx config
+    port: Optional[int]

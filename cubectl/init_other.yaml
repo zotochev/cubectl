@@ -22,7 +22,7 @@ status_file_dir: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp
 
 
 processes:
-  - name: service_0
+  - name: service_3
 
     executor: 'python'
     file: 'tests/assets/example_services/example_service_0.py'
@@ -35,7 +35,7 @@ processes:
     dotenv: false       # if true (default true) tries to load .env file near command file
 
     service: true       # if true (default false) assigns port and nginx config
-  - name: service_1
+  - name: service_4
 
     executor: 'python'
     file: 'tests/assets/example_services/example_service_0.py'

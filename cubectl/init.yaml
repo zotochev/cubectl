@@ -21,6 +21,7 @@ status_file_dir: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp
 # do not use enegan dev
 
 
+# each process follows InitProcessConfig
 processes:
   - name: service_0
 
@@ -36,6 +37,7 @@ processes:
     dotenv: false       # if true (default true) tries to load .env file near command file
 
     service: true       # if true (default false) assigns port and nginx config
+    port: 1234
 
   - name: service_1
 
@@ -45,3 +47,4 @@ processes:
       '--name': 'name_1'
 
     service: true
+    port: 1234

@@ -30,7 +30,7 @@ class SystemData(BaseModel):
 
 
 class ServiceData(BaseModel):
-    port: int
+    port: Optional[int]
     nginx_config: Optional[str]
 
 
