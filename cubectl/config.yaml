@@ -1,0 +1,4 @@
+#applications_register: '/tmp/cubectl_applications_register.yaml'
+applications_register: '/home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/cubectl_applications_register.yaml'
+
+default_status_files_dir: '/tmp'

@@ -23,12 +23,13 @@ __all__ = [
 
 def register_application(
         init_config: dict,
+        status_file: str,
         register_path: str = '/tmp/cubectl_applications_register.yaml'
 ):
     init_config = InitFileModel(**init_config)
     register_path = Path(register_path)
     entity = RegisterEntity(
-        status_file=init_config.status_file,
+        status_file=status_file,
     )
 
     register_from_file = None
@@ -70,10 +71,15 @@ def init_service_status(root_dir, process_init_config: InitProcessConfig):
         init_config: InitProcessConfig
     """
 
-    file = resolve_path(root_dir=root_dir, file_path=process_init_config.file)
+    file = resolve_path(
+        root_dir=root_dir, file_path=process_init_config.file, return_dir=False
+    )
     process_init_config.file = file
     env_files = process_init_config.env_files
-    process_init_config.env_files = [resolve_path(root_dir=root_dir, file_path=x) for x in env_files]
+    process_init_config.env_files = [
+        resolve_path(root_dir=root_dir, file_path=x, return_dir=False)
+        for x in env_files
+    ]
 
     service_data = None     # ServiceData()
 
@@ -127,7 +133,6 @@ def create_status_object(init_config: dict) -> SetupStatus:
     """
 
     init_config = InitFileModel(**init_config)
-    init_config.status_file = init_config.status_file
     status = SetupStatus(
         jobs=init_jobs(init_config),
         services=init_services_status(init_config)

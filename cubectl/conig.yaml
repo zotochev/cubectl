@@ -1,3 +1,0 @@
-applications_register: '/tmp/cubectl_applications_register.yaml'
-
-default_status_files_dir: '/tmp'

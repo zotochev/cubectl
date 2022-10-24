@@ -1,4 +1,5 @@
 from src.utils import read_yaml
+from pathlib import Path
 
 
 config = read_yaml('config.yaml')

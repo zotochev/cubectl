@@ -16,7 +16,7 @@ class RegisterEntity(BaseModel):
 
 class InitFileModel(BaseModel):
     installation_name: str = 'default_name'
-    status_file: str = '/tmp/default_status_file.yaml'
+    status_file_dir: str = '/tmp'
     set_up_commands: list = []
     tear_down_commands: list = []
     root_dir: Optional[str]

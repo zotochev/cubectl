@@ -1,4 +1,4 @@
-installation_name: enegan
+installation_name: not_enegan
 
 set_up_commands: []       # not implemented
 tear_down_commands: []    # not implemented

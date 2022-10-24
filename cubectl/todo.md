@@ -6,6 +6,11 @@
 - [ ] change state of processes using configurator
 - [x] decide who will choose ports for services -> Configurator class
 
+- [ ] add init command
+- [ ] add start command
+- [ ] add start-all command
+- [ ] add nginx config creation
+
 ---
 ## ServiceProcess
 - [x] created class
