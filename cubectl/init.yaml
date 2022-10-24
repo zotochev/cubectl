@@ -24,27 +24,24 @@ status_file_dir: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp
 processes:
   - name: service_0
 
-    command: 'python src/example_services/example_service_0.py'
-
     executor: 'python'
-    file: 'tests/example_services/example_service_0.py'
+    file: 'tests/assets/example_services/example_service_0.py'
     arguments:
-      '--name': 'new_name'
+      '--name': 'name_0'
 
     environment:        # object of env variables
       FOO: 'BAR'
+      ONE: 'ONE1'
     env-files: []       # list of env files
     dotenv: false       # if true (default true) tries to load .env file near command file
 
     service: true       # if true (default false) assigns port and nginx config
 
   - name: service_1
-    command: ''
 
-  - name: worker_0
-    service: false
-    command: ''
+    executor: 'python'
+    file: 'tests/assets/example_services/example_service_0.py'
+    arguments:
+      '--name': 'name_1'
 
-  - name: worker_1
-    service: false
-    command: ''
+    service: true

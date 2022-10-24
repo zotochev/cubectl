@@ -11,7 +11,7 @@ class InitProcessConfig(BaseModel):
     name: Optional[str]
     command: Optional[str]                # deprecated
 
-    executor: Optional[str] = 'python'
+    executor: str = ''
     file: Optional[str]                   # cubectl/tests/example_services/example_service_0.py'
     arguments: Optional[dict]              # {'--name': 'new_name'}
 

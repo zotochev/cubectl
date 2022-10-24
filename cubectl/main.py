@@ -1,17 +1,15 @@
-from time import sleep
-import dotenv
-from pathlib import Path
-from typing import Optional
 import click
-
 import yaml
+from pathlib import Path
 
-from cubectl import register_location
-from src.utils import resolve_path, read_yaml
-from src.initialization_functions import register_application
-from src.initialization_functions import create_status_object
+from src.configurator import Configurator
+from src.executor import Executor
 
-from src.models import InitFileModel
+from cubectl import config, register_location
+from src.utils import resolve_path
+
+
+configurator = Configurator(config)
 
 
 @click.group()
@@ -31,15 +29,6 @@ def cli():
         'env_files': ['cubectl/tests/example_services/environments/local.env']
     }
 
-    # if command == 'init':
-    #     init_file = args
-    #
-    # if command == 'start':
-    #     service_name = args
-    #
-    # if command == 'start-all':
-    #     service_name = args
-
 
 @cli.command('init')
 @click.argument('init_file')
@@ -54,47 +43,48 @@ def init(init_file: str):
     init_file = resolve_path(
         root_dir=Path.cwd(), file_path=init_file, return_dir=False
     )
-
-    init_config: InitFileModel = read_yaml(
-        init_file, validation_model=InitFileModel
-    )
-    root_dir = init_config.root_dir if init_config.root_dir else Path(init_file).parent
-    init_config.root_dir = str(root_dir)
-    # status_file = resolve_path(
-    #     root_dir=root_dir, file_path=init_config.status_file, return_dir=False
-    # )
-    status_file = Path(
-        init_config.status_file_dir,
-        f'{init_config.installation_name}_status_file.yaml'
-    )
-
-    # register_path = resolve_path(
-    #     root_dir=root_dir, file_path='tests/assets/temp/cubectl_applications_register.yaml'
-    # )
-    register_application(
-        init_config=init_config.dict(),
-        status_file=str(status_file),
-        register_path=register_location,
-    )
-    status_object = create_status_object(
-        init_config=init_config.dict(),
-    )
-
-    status_file = Path(status_file)
-    if status_file.is_dir():
-        status_file = Path(status_file, '')
-    with open(status_file, 'w') as f:
-        yaml.dump(status_object.dict(), f)
+    configurator.init(init_file=init_file, reinit=True)
 
 
 @cli.command('start')
+@click.argument('app_name', default='all')
 @click.argument('services', nargs=-1)
-def status(services: tuple):
-    """
-    Shows running applications. If there are more than one.
-    /tmp/cubectl_applications.yaml
-    """
-    print(f'hi from start: {services}')
+def status(app_name: str, services: tuple):
+    configurator.start(app_name=app_name, services=services)
+
+
+@cli.command('stop')
+@click.argument('app_name', default='all')
+@click.argument('services', nargs=-1)
+def status(app_name: str, services: tuple):
+    configurator.stop(app_name=app_name, services=services)
+
+
+@cli.command('watch')
+@click.argument('app_name', default='default')
+def watch(app_name):
+    with Path(register_location).open() as f:
+        register: dict = yaml.load(f, Loader=yaml.Loader)
+
+    if not register:
+        raise Exception(
+            'cubectl: no applications registered (register is empty)'
+        )
+    elif app_name == 'default':
+        # fixme change register from dict to list
+        #   dicts are not ordered and getting first element is impossible
+
+        status_file = list(register.values())[0]['status_file']
+    elif app_name not in register:
+        raise Exception(
+            f'cubectl: application {app_name} not found in register. '
+            f'Try to call cubectl init before.'
+        )
+    else:
+        status_file = register[app_name]['status_file']
+
+    e = Executor(status_file)
+    e.process()
 
 
 if __name__ == '__main__':
