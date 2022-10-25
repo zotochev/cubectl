@@ -1,6 +1,12 @@
 import os
 
+import logging
+from typing import Optional
+
 from src.utils import read_yaml
+
+
+log = logging.getLogger(__file__)
 
 
 def check_if_launched_as_root():
@@ -28,7 +34,7 @@ def check_service_names_for_duplicates(ports_allocated_by_app: dict):
         )
 
 
-def get_next_port(ports_allocated_by_app: dict) -> int:
+def get_next_port(ports_allocated_by_app: dict) -> Optional[int]:
     ports = []
 
     for app_ports in ports_allocated_by_app.values():
@@ -45,18 +51,37 @@ def get_all_allocated_ports_by_app(register: dict):
         try:
             status = read_yaml(register[app_name]['status_file'])
         except FileNotFoundError:
+            log.warning(f"cubectl: get_all_allocated_ports_by_app: "
+                        f"status_file for {app_name}: "
+                        f"{register[app_name]['status_file']} not found."
+                        )
+            continue
+        except KeyError:
+            log.warning(f"cubectl: get_all_allocated_ports_by_app: "
+                        f" key status_file for {app_name}: not found in register."
+                        )
             continue
         services = status.get('services', [])
-        # ports = []
+
         ports = dict()
         for service in services:
-            service_data = service['service_data']
-            service_name = service['init_config']['name']
-            if not service_data:
-                continue
-            # ports.append(service_data['port'])
-            ports[service_name] = service_data['port']
+            try:
+                service_data = service['service_data']
+                service_name = service['init_config']['name']
+                if not service_data:
+                    continue
+
+                ports[service_name] = service_data['port']
+            except KeyError as ke:
+                log.error(
+                    f'cubectl: get_all_allocated_ports: wrong structure for '
+                    f'service instance in status file: '
+                    f'{register[app_name]["status_file"]} \n'
+                    f'key error: {ke}'
+                )
+                raise
         ports_by_app[app_name] = ports
+
     return ports_by_app
 
 
