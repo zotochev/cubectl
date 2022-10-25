@@ -39,8 +39,35 @@ class Executor:
                 return process
         return None
 
+    def _send_report(self, report_file: str):
+        report = dict()
+
+        for process in self._processes:
+            process: ServiceProcess
+            report[process.name] = process.status().dict()
+
+        try:
+            with Path(report_file).open('w') as f:
+                yaml.dump(report, f)
+        except Exception as e:
+            log.error(
+                f'cubectl: executor: failed to save report: {report_file} '
+                f'with error: {e}.'
+            )
+
+    def _do_jobs(self, jobs: dict):
+        factory = {
+            'get_report': self._send_report,
+        }
+
+        for method in factory:
+            if method in jobs:
+                factory[method](jobs[method])
+
     def _update_processes(self):
         status = self._get_status()
+
+        self._do_jobs(status.get('jobs', {}))
 
         for process_status in status.get('services', []):
             init_config = process_status['init_config']

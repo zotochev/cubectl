@@ -2,13 +2,14 @@ import yaml
 from pathlib import Path
 import logging
 from functools import reduce
+from time import sleep
 
-from src import config
+# from src import config
 from src.utils import resolve_path, read_yaml
 from src.initialization_functions import register_application
 from src.initialization_functions import create_status_object
 
-from src.models import InitFileModel, ProcessState, ServiceData
+from src.models import InitFileModel, ProcessState, SetupStatus
 
 
 log = logging.getLogger(__file__)
@@ -88,7 +89,7 @@ class Configurator:
         if allocated_ports:
             port = max(allocated_ports)
         else:
-            port = config.get('init_port_number', 9300)
+            port = self._config.get('init_port_number', 9300)
 
         for service in status.services:
             # service: InitProcessConfig
@@ -180,7 +181,6 @@ class Configurator:
 
         with status_file.open('w') as new_status_file:
             yaml.dump(status, new_status_file)
-        pass
 
     def start(self, app_name: str, services: tuple):
         self._change_process_state(
@@ -191,3 +191,50 @@ class Configurator:
         self._change_process_state(
             app_name=app_name, services=services, state=ProcessState.stopped
         )
+
+    def status(self, app_name: str = None, report_location: str = '/tmp'):
+        """
+        Arguments:
+            app_name:
+            report_location: location of file with results
+
+        Report Format:
+
+            Name             State                  Pid   Port    Uptime
+            Services
+              kanban         started                120   9301    00:23:54
+              tenants        stopped                121   9302    00:03:21
+            Workers
+              get_cdr        failed_starting_loop   122
+              get_sim_info   started                123           00:23:41
+
+        """
+
+        _ = self
+        report_file = f'{report_location}/{app_name}_status_report.yaml'
+        register = self._get_app_register(app_name=app_name)
+        status_file = Path(
+            register['status_file']
+        )
+        status = SetupStatus(
+            **self._get_status(app_name=app_name)
+        )
+
+        status.jobs = {
+            'get_report': report_file
+        }
+        report_file_path = Path(report_file)
+        report_file_path.touch()
+
+        with status_file.open('w') as new_status_file:
+            yaml.dump(status, new_status_file)
+
+        init_time_changed = int(report_file_path.stat().st_mtime)
+        report = None
+
+        for _ in range(self._config.get('report_number_of_cycles', 5)):
+            sleep(self._config.get('report_retry_wait_time', 1))
+            last_time_changed = int(report_file_path.stat().st_mtime)
+            if init_time_changed != last_time_changed:
+                report = read_yaml(report_file)
+        return report

@@ -24,6 +24,7 @@ class SystemData(BaseModel):
     pid: Optional[int]
     state: ProcessState
     error_code: Optional[int]
+    started_at: Optional[str]
 
     class Config:  
         use_enum_values = True

@@ -25,19 +25,15 @@ configurator = Configurator(config)
 @click.group()
 def cli():
     """
+    Script to control processes
+
+    Commands:
+        init:
+        start:
+        stop:
+        watch:
+        setup-nginx:
     """
-
-    init_config_ok = {
-        'name': 'test_process',
-        # 'command': 'python cubectl/tests/example_services/example_service_0.py',
-
-        'executor': 'python',
-        'file': 'cubectl/tests/example_services/example_service_0.py',
-        'arguments': {'--name': 'new_name'},
-        'dotenv': True,
-        'environment': {'TWO': 'TWO2'},
-        'env_files': ['cubectl/tests/example_services/environments/local.env']
-    }
 
 
 @cli.command('init')
@@ -47,9 +43,12 @@ def init(init_file: str):
     Registers application in cubectl_application_register.yaml
     Creates status file out of init_file.
 
+    This command does not start services. To start service use 'start' command.
+
     Arguments:
         init_file:  init file path
     """
+
     init_file = resolve_path(
         root_dir=Path.cwd(), file_path=init_file, return_dir=False
     )
@@ -59,20 +58,39 @@ def init(init_file: str):
 @cli.command('start')
 @click.argument('app_name', default='all')
 @click.argument('services', nargs=-1)
-def status(app_name: str, services: tuple):
+def start(app_name: str, services: tuple):
+    """
+    Arguments:
+        app_name: [Optional] Application name
+        services: tuple of services names from init_file
+    """
+
     configurator.start(app_name=app_name, services=services)
 
 
 @cli.command('stop')
 @click.argument('app_name', default='all')
 @click.argument('services', nargs=-1)
-def status(app_name: str, services: tuple):
+def start(app_name: str, services: tuple):
+    """
+    Arguments:
+        app_name: [Optional] Application name
+        services: tuple of services names from init_file
+    """
+
     configurator.stop(app_name=app_name, services=services)
 
 
 @cli.command('watch')
 @click.argument('app_name', default='default')
 def watch(app_name):
+    """
+    Starts monitoring for initializated services
+
+    Arguments:
+        app_name:
+    """
+
     status_file = get_status_file(
         app_name=app_name, register_location=register_location
     )
@@ -85,6 +103,14 @@ def watch(app_name):
 @click.option('--apply', default=False, is_flag=True)
 @click.argument('app_name', default='default')
 def setup_nginx(app_name, apply):
+    """
+    Create nginx config file for services from init file.
+
+    Arguments:
+        app_name:
+        apply:
+    """
+
     if apply and not check_if_launched_as_root():
         raise Exception('cubectl: setup-nginx: to apply run as the root user.')
 

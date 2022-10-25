@@ -23,7 +23,11 @@ log = logging.getLogger(__file__)
 class ServiceProcess:
     def __init__(self, init_config: dict):
         self._init_config = InitProcessConfig(**init_config)
-        self._start_up_command: list[str] = self._create_start_up_command()
+        self._start_up_command: list[str] = _create_start_up_command(
+            executor=self._init_config.executor,
+            file=self._init_config.file,
+            args=self._init_config.arguments
+        )
         self._process: Optional[Popen] = None
         self._state = ProcessState.stopped
         self._process_started_at = None
@@ -32,17 +36,8 @@ class ServiceProcess:
         self._resolve_env()
 
         if self._init_config.service:
-            # todo
-            #   choose port
-            #   create nginx config
-            pass
-
-    def _create_start_up_command(self):
-        executor = self._init_config.executor
-        file = self._init_config.file
-        args = self._init_config.arguments
-        args = ' '.join([f'{k} {v}' for k, v in args.items()])
-        return [x for x in f'{executor} {file} {args}'.split() if x]
+            if self._init_config.port:
+                pass
 
     def start(self):
         self._check_process()
@@ -101,6 +96,7 @@ class ServiceProcess:
             pid=self.pid,
             state=self._state,
             error_code=error_code,
+            started_at=str(self._process_started_at),
         )
 
     def _status_collect_service_data(self) -> ServiceData:
@@ -173,8 +169,6 @@ class ServiceProcess:
         and set them up to result dict
         """
 
-        # if self._init_config.dotenv:
-        #     self._apply_env_dotenv()
         if self._init_config.env_files:
             self._apply_env_files()
 
@@ -185,29 +179,6 @@ class ServiceProcess:
                 result[k] = v
         return result
 
-    def _compare_status_init_config(self, desired_status: InitProcessConfig) -> bool:
-        """
-        Compares desired_status with current state of process and if not
-        replaces init file with new one.
-
-        todo:
-            compare env (also check inside files)
-
-        Returns:
-            True if desired_status is same as current
-            False in other case
-        """
-
-        desired_status = desired_status.dict()
-        current_status = self._init_config.copy().dict()
-        not_found = '__not_found__'
-
-        for key, value in desired_status.items():
-            current_value = current_status.get(key, not_found)
-            if value != current_value and current_value != not_found:
-                return False
-        return True
-
     def _make_follow_updated_init(self, desired_status: InitProcessConfig):
 
         desired_status = desired_status.dict()
@@ -216,9 +187,13 @@ class ServiceProcess:
 
         self._init_config = InitProcessConfig(
             **desired_status,
-            **not_changed       # note: ???
+            **not_changed,
         )
-        self._start_up_command = self._create_start_up_command()
+        self._start_up_command: list[str] = _create_start_up_command(
+            executor=self._init_config.executor,
+            file=self._init_config.file,
+            args=self._init_config.arguments
+        )
 
     def _compare_status_service_data(self, desired_status: ServiceData) -> bool:
         """
@@ -239,7 +214,7 @@ class ServiceProcess:
     def _make_to_follow_state(self, state: ProcessState):
         factory = {
             ProcessState.started: self.start,
-            ProcessState.stopped: self.stop
+            ProcessState.stopped: self.stop,
         }
         factory[state]()
 
@@ -252,7 +227,10 @@ class ServiceProcess:
     def apply_status(self, desired_status: ProcessStatus):
         to_restart = False
 
-        if not self._compare_status_init_config(desired_status.init_config):
+        if not _compare_status_init_config(
+            current_status=self._init_config,
+            desired_status=desired_status.init_config
+        ):
             to_restart = True
             self._make_follow_updated_init(desired_status.init_config)
 
@@ -276,17 +254,35 @@ class ServiceProcess:
     def set_log_level(self):
         raise NotImplemented('service_process.py')
 
-    def generate_nginx_conf(self):
-        raise NotImplemented('service_process.py')
 
-    def _check_requirements(self):
-        raise NotImplemented('service_process.py')
+def _create_start_up_command(executor: str, file: str, args: dict):
+    args = ' '.join([f'{k} {v}' for k, v in args.items()])
+    return [x for x in f'{executor} {file} {args}'.split() if x]
 
-    def _set_env(self):
-        raise NotImplemented('service_process.py')
 
-    def _check_external_resources(self):
-        raise NotImplemented('service_process.py')
+def _compare_status_init_config(current_status: InitProcessConfig, desired_status: InitProcessConfig) -> bool:
+    """
+    Compares desired_status with current state of process and if not
+    replaces init file with new one.
+
+    todo:
+        compare env (also check inside files)
+
+    Returns:
+        True if desired_status is same as current
+        False in other case
+    """
+
+    desired_status = desired_status.dict()
+    # current_status = self._init_config.copy().dict()
+    current_status = current_status.dict()
+    not_found = '__not_found__'
+
+    for key, value in desired_status.items():
+        current_value = current_status.get(key, not_found)
+        if value != current_value and current_value != not_found:
+            return False
+    return True
 
 
 def main():
