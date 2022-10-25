@@ -37,7 +37,7 @@ processes:
     dotenv: false       # if true (default true) tries to load .env file near command file
 
     service: true       # if true (default false) assigns port and nginx config
-    port: 1234
+#    port: 1234
 
   - name: service_1
 
@@ -47,4 +47,4 @@ processes:
       '--name': 'name_1'
 
     service: true
-    port: 1234
+#    port: 1234

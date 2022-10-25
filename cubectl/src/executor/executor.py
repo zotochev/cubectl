@@ -66,9 +66,17 @@ class Executor:
                 f'with error: {e}.'
             )
 
+    def restart(self, services: str):
+        services = [x for x in services.split(',') if x]
+        for process in self._processes:
+            process: ServiceProcess
+            if process.name in services or not services:
+                process.restart()
+
     def _do_jobs(self, jobs: dict):
         factory = {
             'get_report': self._send_report,
+            'restart': self.restart,
         }
 
         for method in factory:

@@ -10,15 +10,15 @@ service_0:
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
     name: service_0
-    port: 1234
+    port: null
     service: true
   service_data:
     nginx_config: ''
-    port: 123456789
+    port: 1239
   system_data:
     error_code: null
-    pid: 645961
-    started_at: '2022-10-25 15:47:38.319014'
+    pid: 702296
+    started_at: '2022-10-25 16:32:59.942171'
     state: STARTED
 service_1:
   init_config:
@@ -30,13 +30,13 @@ service_1:
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
     name: service_1
-    port: 1234
+    port: null
     service: true
   service_data:
     nginx_config: ''
-    port: 123456789
+    port: 1240
   system_data:
     error_code: null
-    pid: 645962
-    started_at: '2022-10-25 15:47:38.521407'
+    pid: 702299
+    started_at: '2022-10-25 16:33:00.245991'
     state: STARTED

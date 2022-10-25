@@ -193,6 +193,22 @@ class Configurator:
             app_name=app_name, services=services, state=ProcessState.stopped
         )
 
+    def restart(self, app_name: str = None, services: tuple = tuple()):
+        app_name = app_name + '_' if app_name else ''
+        register = self._get_app_register(app_name=app_name)
+        status_file = Path(
+            register['status_file']
+        )
+        status = SetupStatus(
+            **self._get_status(app_name=app_name)
+        )
+
+        status.jobs = {
+            'restart': ','.join(services)
+        }
+        with status_file.open('w') as new_status_file:
+            yaml.dump(status.dict(), new_status_file)
+
     def status(self, app_name: str = None, report_location: str = '/tmp'):
         """
         Arguments:

@@ -12,11 +12,11 @@ services:
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
     name: service_0
-    port: 1234
+    port: null
     service: true
   service_data:
     nginx_config: null
-    port: 1234
+    port: 1239
   system_data:
     error_code: null
     pid: null
@@ -31,11 +31,11 @@ services:
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
     name: service_1
-    port: 1234
+    port: null
     service: true
   service_data:
     nginx_config: null
-    port: 1234
+    port: 1240
   system_data:
     error_code: null
     pid: null

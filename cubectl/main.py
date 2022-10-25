@@ -1,7 +1,6 @@
 import os
 
 import click
-import yaml
 from pathlib import Path
 
 from src.configurator import Configurator
@@ -72,7 +71,7 @@ def start(app_name: str, services: tuple):
 @cli.command('stop')
 @click.argument('app_name', default='all')
 @click.argument('services', nargs=-1)
-def start(app_name: str, services: tuple):
+def stop(app_name: str, services: tuple):
     """
     Arguments:
         app_name: [Optional] Application name
@@ -80,6 +79,19 @@ def start(app_name: str, services: tuple):
     """
 
     configurator.stop(app_name=app_name, services=services)
+
+
+@cli.command('restart')
+@click.argument('app_name', default='all')
+@click.argument('services', nargs=-1)
+def stop(app_name: str, services: tuple):
+    """
+    Arguments:
+        app_name: [Optional] Application name
+        services: tuple of services names from init_file
+    """
+
+    configurator.restart(app_name=app_name, services=services)
 
 
 @cli.command('status')

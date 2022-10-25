@@ -65,6 +65,6 @@ def format_report(report: dict) -> str:
         if p_array:
             result += template.format(*(p_name, '', '', '', ''))
         for process in p_array:
-            result += template.format(*process)
+            result += template.format(*[str(x) for x in process])
 
     return result

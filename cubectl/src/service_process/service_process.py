@@ -35,9 +35,10 @@ class ServiceProcess:
 
         self._resolve_env()
 
+        self._port = None
         if self._init_config.service:
             if self._init_config.port:
-                pass
+                self._port = self._init_config.port
 
     def start(self):
         self._check_process()
@@ -107,7 +108,7 @@ class ServiceProcess:
         _ = self
 
         return ServiceData(
-            port=123456789,
+            port=self._port,
             nginx_config='',
         )
 
@@ -200,10 +201,10 @@ class ServiceProcess:
         'service_data': {'nginx_config': '', 'port': 123456789},
         """
         _ = self
-        return True
+        return self._port == desired_status.port
 
     def _make_follow_service_data(self, desired_status: ServiceData):
-        pass
+        self._port = desired_status.port
 
     def _compare_status_system_data(self, desired_status: SystemData) -> bool:
         """

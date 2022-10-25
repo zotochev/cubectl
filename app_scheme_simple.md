@@ -10,6 +10,7 @@ Configurator-->status_file: * Create status file\n* Changes status file
 Executor-->service_0: applies desired status
 Executor-->service_1: health checks
 Executor-->service_2
+Executor-->report_files
 
 init_file-->Configurator: Initialises application by registering and creating status file
 
