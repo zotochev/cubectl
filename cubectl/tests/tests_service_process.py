@@ -9,7 +9,6 @@ from cubectl.src.service_process.service_process import ServiceProcess
 class TestServiceProcessBasic(unittest.TestCase):
     init_config_ok = {
         'name': 'test_process',
-        # 'command': 'python example_services/example_service_0.py',
         'executor': 'python',
         'file': 'assets/example_services/example_service_0.py',
         'arguments': {'--name': 'new_name'}
@@ -17,7 +16,6 @@ class TestServiceProcessBasic(unittest.TestCase):
 
     init_config_ng = {
         'name': 'test_process',
-        # 'command': 'python ../asdfgbvcwwdefregtrythtrgrfewdergtrhtgrfedfrvice_0.py',
         'executor': 'python',
         'file': 'not_existing_example_services/example_service_0.py',
         'arguments': {'--name': 'new_name'}
@@ -102,5 +100,5 @@ class TestServiceProcessBasic(unittest.TestCase):
     def test_print_status(self):
         pr = ServiceProcess(init_config=self.init_config_ok)
         pr.start()
-        pprint(pr.status().dict())
+        # pprint(pr.status().dict())
         pr.stop()

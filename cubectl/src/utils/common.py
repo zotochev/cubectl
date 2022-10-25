@@ -1,3 +1,5 @@
+import logging
+
 import yaml
 from pathlib import Path
 from functools import cache
@@ -9,6 +11,8 @@ __all__ = [
     "read_yaml",
     "resolve_path",
 ]
+
+log = logging.getLogger(__name__)
 
 
 def read_yaml(
@@ -31,15 +35,18 @@ def read_yaml(
     return loaded_file
 
 
-def resolve_path(root_dir: Optional[Union[Path, str]], file_path: str, return_dir: bool = False) -> str:
-    # resolved_path = str(root_dir)
+def resolve_path(
+        root_dir: Optional[Union[Path, str]],
+        file_path: str, return_dir: bool = False
+) -> str:
 
     if str(file_path).startswith('/'):
         resolved_path = Path(file_path)
     elif file_path is None:
         resolved_path = Path(root_dir)
     elif root_dir is None or not str(root_dir).startswith('/'):
-        resolved_path = Path(file_path).resolve(strict=True)
+        log.warning(f'cubectl: common: resolve_path: invalid root dir: {root_dir}')
+        resolved_path = Path(file_path).resolve()
     else:
         resolved_path = Path(root_dir, file_path)
 

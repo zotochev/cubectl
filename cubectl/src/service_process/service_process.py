@@ -38,18 +38,11 @@ class ServiceProcess:
             pass
 
     def _create_start_up_command(self):
-        if self._init_config.command is not None:
-            log.warning(
-                f'{__file__}: Use executor, arguments '
-                f'and file fields instead command.'
-            )
-            return self._init_config.command.split()
-        else:
-            executor = self._init_config.executor
-            file = self._init_config.file
-            args = self._init_config.arguments
-            args = ' '.join([f'{k} {v}' for k, v in args.items()])
-            return [x for x in f'{executor} {file} {args}'.split() if x]
+        executor = self._init_config.executor
+        file = self._init_config.file
+        args = self._init_config.arguments
+        args = ' '.join([f'{k} {v}' for k, v in args.items()])
+        return [x for x in f'{executor} {file} {args}'.split() if x]
 
     def start(self):
         self._check_process()

@@ -1,5 +1,6 @@
 import yaml
 from pathlib import Path
+import logging
 
 from src.utils import resolve_path
 
@@ -20,12 +21,16 @@ __all__ = [
     "create_status_object",
 ]
 
+log = logging.getLogger(__file__)
+
 
 def register_application(
         init_config: dict,
         status_file: str,
         register_path: str = '/tmp/cubectl_applications_register.yaml'
 ):
+    """Writes new application to register.yaml file."""
+
     init_config = InitFileModel(**init_config)
     register_path = Path(register_path)
     entity = RegisterEntity(
@@ -47,39 +52,36 @@ def register_application(
 
 def init_service_status(root_dir, process_init_config: InitProcessConfig):
     """
-    class InitProcessConfig(BaseModel):
-        name: Optional[str]
-        command: Optional[str]                # deprecated
+    Arguments:
+        root_dir: path string for resolving path arguments for
+            lauching commands and env files.
+        process_init_config:
+            class InitProcessConfig(BaseModel):
+                name: Optional[str]
+                command: Optional[str]                # deprecated
 
-        executor: Optional[str] = 'python'
-        file: Optional[str]                   # cubectl/tests/example_services/example_service_0.py'
-        arguments: Optional[dict]              # {'--name': 'new_name'}
+                executor: Optional[str] = 'python'
+                file: Optional[str]                   # cubectl/tests/example_services/example_service_0.py'
+                arguments: Optional[dict]              # {'--name': 'new_name'}
 
-        environment: dict[str, str] = dict()  # list of env variables
-        env_files: list[str] = list()         # list of env files
-        dotenv: bool = True                   # if true (default true) tries to load .env file near command file
-        service: bool = True                  # if true (default false) assigns port and nginx config
-
-    class SystemData(BaseModel):
-        pid: Optional[int]
-        state: ProcessState
-        error_code: Optional[int]
-
-    class ProcessStatus(BaseModel):
-        system_data: SystemData
-        service_data: Optional[ServiceData]
-        init_config: InitProcessConfig
+                environment: dict[str, str] = dict()  # list of env variables
+                env_files: list[str] = list()         # list of env files
+                dotenv: bool = True                   # if true (default true) tries to load .env file near command file
+                service: bool = True                  # if true (default false) assigns port and nginx config
     """
+    process_name = process_init_config.name
 
     file = resolve_path(
         root_dir=root_dir, file_path=process_init_config.file, return_dir=False
     )
+
     if not Path(file).is_file():
-        raise Exception(
-            f'cubectl: application_registration: command: '
-            f'{process_init_config.executor} {file} '
-            f'is not executable.'
+        _message = (
+            f'cubectl: application_registration: command for process "{process_name}": \n'
+            f'\t{process_init_config.executor} {file}'
         )
+        log.error(_message)
+        raise FileNotFoundError(_message)
     process_init_config.file = file
     env_files = process_init_config.env_files
     process_init_config.env_files = [
@@ -92,7 +94,7 @@ def init_service_status(root_dir, process_init_config: InitProcessConfig):
     )
     service_data = None
     if process_init_config.service:
-        service_data = ServiceData(port=9000)
+        service_data = ServiceData(port=None)
 
     return ProcessStatus(
         init_config=process_init_config,
