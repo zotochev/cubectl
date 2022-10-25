@@ -71,7 +71,8 @@ class Configurator:
         status_file = Path(register['status_file'])
 
         with status_file.open() as f:
-            return yaml.load(f, Loader=yaml.FullLoader)
+            result = yaml.load(f, Loader=yaml.FullLoader)
+        return result if result else dict()
 
     def _assign_ports_to_services(self, status):
         ports_by_app = self._get_all_allocated_ports_by_app()
@@ -198,20 +199,11 @@ class Configurator:
             app_name:
             report_location: location of file with results
 
-        Report Format:
-
-            Name             State                  Pid   Port    Uptime
-            Services
-              kanban         started                120   9301    00:23:54
-              tenants        stopped                121   9302    00:03:21
-            Workers
-              get_cdr        failed_starting_loop   122
-              get_sim_info   started                123           00:23:41
-
         """
 
         _ = self
-        report_file = f'{report_location}/{app_name}_status_report.yaml'
+        app_name = app_name + '_' if app_name else ''
+        report_file = f'{report_location}/{app_name}status_report.yaml'.replace('//', '/')
         register = self._get_app_register(app_name=app_name)
         status_file = Path(
             register['status_file']
@@ -227,14 +219,14 @@ class Configurator:
         report_file_path.touch()
 
         with status_file.open('w') as new_status_file:
-            yaml.dump(status, new_status_file)
+            yaml.dump(status.dict(), new_status_file)
 
-        init_time_changed = int(report_file_path.stat().st_mtime)
+        init_time_changed = report_file_path.stat().st_mtime
         report = None
 
         for _ in range(self._config.get('report_number_of_cycles', 5)):
             sleep(self._config.get('report_retry_wait_time', 1))
-            last_time_changed = int(report_file_path.stat().st_mtime)
-            if init_time_changed != last_time_changed:
-                report = read_yaml(report_file)
+            last_time_changed = report_file_path.stat().st_mtime
+            if init_time_changed < last_time_changed:
+                return read_yaml(report_file)
         return report

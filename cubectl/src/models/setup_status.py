@@ -45,5 +45,5 @@ JobName = str
 
 
 class SetupStatus(BaseModel):
-    jobs: dict[JobName, InitProcessConfig] = dict()
+    jobs: dict[JobName, object] = dict()
     services: list[ProcessStatus] = list()

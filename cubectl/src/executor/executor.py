@@ -5,7 +5,7 @@ from time import sleep
 from typing import Optional
 
 from src.service_process import ServiceProcess
-from src.models.setup_status import ProcessStatus
+from src.models.setup_status import ProcessStatus, SetupStatus
 
 
 log = logging.getLogger(__file__)
@@ -20,8 +20,19 @@ class Executor:
 
     def __init__(self, status_file: str):
         self._status_file = Path(status_file).resolve(strict=True)
+        self._validate_status_file(self._status_file)
         self._status_file_last_change = int(self._status_file.stat().st_mtime)
         self._processes = self._setup_processes()
+
+    @staticmethod
+    def _validate_status_file(status_file: Path):
+        with status_file.open() as sf:
+            status_file_dict = yaml.load(sf, Loader=yaml.FullLoader)
+            if 'jobs' not in status_file_dict and 'services' not in status_file_dict:
+                raise TypeError(
+                    f'cubectl: Executor: invalid status file structure: '
+                    f'{status_file_dict.keys()}. For: {status_file}'
+                )
 
     def _setup_processes(self) -> list:
         status = self._get_status()

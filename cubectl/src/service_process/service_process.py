@@ -70,7 +70,7 @@ class ServiceProcess:
 
     @property
     def pid(self) -> int:
-        return self._process.pid
+        return self._process.pid if self._process else None
 
     @property
     def state(self):

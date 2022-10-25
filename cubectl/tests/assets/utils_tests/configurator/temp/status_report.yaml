@@ -1,7 +1,5 @@
-jobs:
-  get_report: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/enegan_status_report.yaml
-services:
-- init_config:
+service_0:
+  init_config:
     arguments:
       --name: name_0
     dotenv: false
@@ -15,14 +13,15 @@ services:
     port: 1234
     service: true
   service_data:
-    nginx_config: null
-    port: 1234
+    nginx_config: ''
+    port: 123456789
   system_data:
     error_code: null
-    pid: null
-    started_at: null
+    pid: 544367
+    started_at: '2022-10-25 14:26:49.933299'
     state: STARTED
-- init_config:
+service_1:
+  init_config:
     arguments:
       --name: name_1
     dotenv: true
@@ -34,10 +33,10 @@ services:
     port: 1234
     service: true
   service_data:
-    nginx_config: null
-    port: 1234
+    nginx_config: ''
+    port: 123456789
   system_data:
     error_code: null
-    pid: null
-    started_at: null
+    pid: 544369
+    started_at: '2022-10-25 14:26:50.136377'
     state: STARTED

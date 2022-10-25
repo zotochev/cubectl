@@ -1,0 +1,50 @@
+installation_name: enegan
+
+set_up_commands: []       # not implemented
+tear_down_commands: []    # not implemented
+
+
+# There are two types of processes:
+#   service: requires port and nginx config
+#   worker (service: false): only starts up
+
+# if `root_dir: null` location of this file is assumed as root directory
+# root_dir should be absolut (starts from eg: `/home/admin`)
+root_dir: null
+
+status_file_dir: assets/utils_tests/configurator/temp
+
+# todo
+#   to start up
+#   nginx cofig
+
+# do not use enegan dev
+
+
+# each process follows InitProcessConfig
+processes:
+  - name: service_0
+
+    executor: 'python'
+    file: 'assets/example_services/example_service_0.py'
+    arguments:
+      '--name': 'name_0'
+
+    environment:        # object of env variables
+      FOO: 'BAR'
+      ONE: 'ONE1'
+    env-files: []       # list of env files
+    dotenv: false       # if true (default true) tries to load .env file near command file
+
+    service: true       # if true (default false) assigns port and nginx config
+    port: 1234
+
+  - name: service_1
+
+    executor: 'python'
+    file: 'assets/example_services/example_service_0.py'
+    arguments:
+      '--name': 'name_1'
+
+    service: true
+    port: 1234

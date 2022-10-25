@@ -16,6 +16,7 @@ from src.utils import (
     read_yaml,
     check_service_names_for_duplicates,
     check_if_launched_as_root,
+    format_report
 )
 
 
@@ -79,6 +80,18 @@ def start(app_name: str, services: tuple):
     """
 
     configurator.stop(app_name=app_name, services=services)
+
+
+@cli.command('status')
+@click.argument('app_name', default=None)
+def status(app_name: str):
+    """
+    Arguments:
+        app_name: [Optional] Application name
+    """
+
+    report = configurator.status(app_name=app_name, report_location=config['report_location'])
+    print(format_report(report))
 
 
 @cli.command('watch')

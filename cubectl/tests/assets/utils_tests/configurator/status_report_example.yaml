@@ -1,38 +1,42 @@
-jobs: {}
-services:
-- init_config:
+service_0:
+  init_config:
     arguments:
-      --name: new_name_1
+      --name: name_0
     dotenv: false
     env_files: []
     environment:
       FOO: BAR
+      ONE: ONE1
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
-    name: service_3
+    name: service_0
+    port: 1234
     service: true
   service_data:
-    nginx_config: null
-    port: 9312
+    nginx_config: ''
+    port: 123456789
   system_data:
     error_code: null
-    pid: null
-    state: STOPPED
-- init_config:
+    pid: 544367
+    started_at: '2022-10-25 14:26:49.933299'
+    state: STARTED
+service_1:
+  init_config:
     arguments:
-      --name: new_name_2
-    dotenv: false
+      --name: name_1
+    dotenv: true
     env_files: []
-    environment:
-      FOO: BAR
+    environment: {}
     executor: python
     file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
-    name: service_4
+    name: service_1
+    port: 1234
     service: true
   service_data:
-    nginx_config: null
-    port: 9313
+    nginx_config: ''
+    port: 123456789
   system_data:
     error_code: null
-    pid: null
-    state: STOPPED
+    pid: 544369
+    started_at: '2022-10-25 14:26:50.136377'
+    state: STARTED

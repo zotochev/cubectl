@@ -1,5 +1,5 @@
 jobs:
-  get_report: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/enegan_status_report.yaml
+  get_report: assets/utils_tests/configurator/temp/status_report.yaml
 services:
 - init_config:
     arguments:
