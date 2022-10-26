@@ -1,4 +1,4 @@
-# todo
+# ToDo
 
 ## Common
 
@@ -6,22 +6,31 @@
 - [x] Change state of processes using configurator.
 - [x] Decide who will choose ports for services -> Configurator class.
 
-- [x] Add init command.
-- [x] Add start command.
-- [x] Add start-all command.
-- [x] Add nginx config creation.
+- [x] Add `init` command.
+- [x] Add `start` command.
+- [x] Add `nginx` config creation.
+
+- [ ] `clean` command
+  - [ ] stops all applications
+  - [ ] deletes temp files and directories
+
+- [ ] `fclean`
+  - [ ] launch `clean` command 
+  - [ ] deletes nginx config
 
 ---
 ## ServiceProcess
+Class for launching, monitoring and controlling one process.
 - [x] Created class.
 - [x] Class can start up and stop process.
 - [x] Class can control state of process using config object.
 - [x] Environment var should override other env vars.
 
 
+---
 ## Configurator
 
-Changes `status_file`
+Class for configuring applications `register`, creating and changing `status files`
 
 - [x] Design `status_file`.
   - [x] Services state.
@@ -33,10 +42,14 @@ Changes `status_file`
     - [ ] Via env variable.
     - [ ] Via argument (--port 9006).
 
+---
 ## Executor
+Class that keeps `ServiceProcess` instances, reads `status file` and impacts on processes accordingly to `status file` (starts, stops, retrieves current status).
 
-Starts up processes and controls theirs state using `status_file`.
+- [x] Read `status file` and apply status to processes.
 - [ ] Processes health check.
-  - [x] Restart if failed.
+  - [x] Restart process if failed.
+  - [ ] Stop restarting process after some number of attempts.
+    - [ ] create algorithm using max_attempts, current_attempt, count_attempt
   - [ ] Send message to telegram in some cases.
 - [x] Saving report for `status` command.
