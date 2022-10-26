@@ -4,8 +4,7 @@ import logging
 from functools import reduce
 from time import sleep
 
-# from src import config
-from src.utils import resolve_path, read_yaml
+from src.utils import read_yaml
 from src.initialization_functions import register_application
 from src.initialization_functions import create_status_object
 
@@ -44,7 +43,7 @@ class Configurator:
 
         try:
             return register_dict[app_name]
-        except Exception:
+        except KeyError:
             return list(register_dict.values())[0]
 
     def _get_all_allocated_ports_by_app(self):
