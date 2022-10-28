@@ -14,6 +14,10 @@ from src.models import InitFileModel, ProcessState, SetupStatus
 log = logging.getLogger(__file__)
 
 
+class ConfiguratorException(Exception):
+    pass
+
+
 class Configurator:
     """
     Inits status file.
@@ -29,12 +33,12 @@ class Configurator:
     def _get_register(self) -> dict:
         register = Path(self._app_register).resolve()
         if not register.is_file():
-            raise Exception('cubectl: No register found.')
+            raise ConfiguratorException('cubectl: No register found.')
 
         with register.open() as f:
             register_dict: dict = yaml.load(f, Loader=yaml.FullLoader)
             if not register_dict:
-                raise Exception('cubectl: Register is empty.')
+                raise ConfiguratorException('cubectl: Register is empty.')
 
         return register_dict
 

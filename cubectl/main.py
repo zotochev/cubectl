@@ -2,9 +2,10 @@ import os
 
 import click
 from pathlib import Path
+import dotenv
 
-from src.configurator import Configurator
-from src.executor import Executor
+from src.configurator import Configurator, ConfiguratorException
+from src.executor import Executor, ExecutorException
 
 from src import config, register_location
 from src.utils import (
@@ -20,6 +21,7 @@ from src.utils import (
 
 
 configurator = Configurator(config)
+dotenv.load_dotenv()
 
 
 @click.group()
@@ -52,7 +54,10 @@ def init(init_file: str):
     init_file = resolve_path(
         root_dir=Path.cwd(), file_path=init_file, return_dir=False
     )
-    configurator.init(init_file=init_file, reinit=True)
+    try:
+        configurator.init(init_file=init_file, reinit=True)
+    except ConfiguratorException as ce:
+        print(f"Initialization failed: {ce}")
 
 
 @cli.command('start')
@@ -65,7 +70,10 @@ def start(app_name: str, services: tuple):
         services: tuple of services names from init_file
     """
 
-    configurator.start(app_name=app_name, services=services)
+    try:
+        configurator.start(app_name=app_name, services=services)
+    except ConfiguratorException as ce:
+        print(f"Failed to start {app_name}: {ce}")
 
 
 @cli.command('stop')
@@ -78,20 +86,26 @@ def stop(app_name: str, services: tuple):
         services: tuple of services names from init_file
     """
 
-    configurator.stop(app_name=app_name, services=services)
+    try:
+        configurator.stop(app_name=app_name, services=services)
+    except ConfiguratorException as ce:
+        print(f"Failed to stop {app_name}: {ce}")
 
 
 @cli.command('restart')
 @click.argument('app_name', default='all')
 @click.argument('services', nargs=-1)
-def stop(app_name: str, services: tuple):
+def restart(app_name: str, services: tuple):
     """
     Arguments:
         app_name: [Optional] Application name
         services: tuple of services names from init_file
     """
 
-    configurator.restart(app_name=app_name, services=services)
+    try:
+        configurator.restart(app_name=app_name, services=services)
+    except ConfiguratorException as ce:
+        print(f"Failed to restart {app_name}: {ce}")
 
 
 @cli.command('status')
@@ -102,8 +116,11 @@ def status(app_name: str):
         app_name: [Optional] Application name
     """
 
-    report = configurator.status(app_name=app_name, report_location=config['report_location'])
-    print(format_report(report))
+    try:
+        report = configurator.status(app_name=app_name, report_location=config['report_location'])
+        print(format_report(report))
+    except ConfiguratorException as ce:
+        print(f"Failed to get status for {app_name}: {ce}")
 
 
 @cli.command('watch')
@@ -116,12 +133,20 @@ def watch(app_name):
         app_name:
     """
 
-    status_file = get_status_file(
-        app_name=app_name, register_location=register_location
-    )
+    status_file = None
 
-    e = Executor(status_file)
-    e.process()
+    try:
+        status_file = get_status_file(
+            app_name=app_name, register_location=register_location
+        )
+    except Exception as e:
+        print(f'Failed to retrieve status file for {app_name}. Error: {e}')
+
+    try:
+        e = Executor(status_file)
+        e.process()
+    except ExecutorException as ee:
+        print(f'Failed to start {app_name}. Error: {ee}')
 
 
 @cli.command('setup-nginx')

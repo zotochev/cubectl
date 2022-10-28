@@ -1,1 +1,2 @@
 from src.configurator.configurator import Configurator
+from src.configurator.configurator import ConfiguratorException
