@@ -2,10 +2,10 @@ import logging
 from pathlib import Path
 import yaml
 from time import sleep
-from typing import Optional, Union
+from typing import Optional
 
 from src.service_process import ServiceProcess
-from src.models.setup_status import ProcessStatus, SetupStatus
+from src.models.setup_status import ProcessStatus
 from src.utils import Messanger
 
 
@@ -23,14 +23,22 @@ class Executor:
     Applies changes from state file
     """
 
-    def __init__(self, status_file: str, app_name: str = 'default'):
+    def __init__(self, status_file: str, meta_info: Optional[dict] = None):
+        """
+        Arguments:
+            status_file:
+            meta_info:
+                Info for reports and messaging as additional information.
+                Used as it is not expected to have any specific keys/values.
+        """
+
         self._status_file = Path(status_file).resolve(strict=True)
         self._validate_status_file(self._status_file)
 
         self._status_file_last_change = int(self._status_file.stat().st_mtime)
         self._processes = self._setup_processes()
         self._messanger: Optional[Messanger] = None
-        self._app_name = app_name
+        self._meta_info = meta_info
 
     @staticmethod
     def _validate_status_file(status_file: Path):
@@ -109,12 +117,17 @@ class Executor:
             process_status = ProcessStatus(**process_status)
             process.apply_status(process_status)
 
+    def _health_check(self):
+        for process in self._processes:
+            if process.is_fail_restart_loop() or True:
+                self._message_process_status(process=process)
+
     def _get_status(self):
         with self._status_file.open() as f:
             status = yaml.load(f, Loader=yaml.FullLoader)
         return status
 
-    def _is_status_changed(self):
+    def _is_status_file_changed(self):
         last_change = int(self._status_file.stat().st_mtime)
 
         if last_change != self._status_file_last_change:
@@ -125,8 +138,10 @@ class Executor:
 
     def process(self, cycle_period: int = 1):
         while True:
-            if self._is_status_changed():
+            if self._is_status_file_changed():
                 self._update_processes()
+
+            self._health_check()
 
             sleep(cycle_period)
 
@@ -138,9 +153,9 @@ class Executor:
             return
 
         message = {
-            'app': self._app_name,
             'process_name': process.name,
             'state': process.state,
             'note': note,
+            'meta_info': self._meta_info,
         }
         self._messanger.post(message=message)

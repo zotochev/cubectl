@@ -19,6 +19,7 @@ from src.utils import (
     format_report,
     TelegramMessanger,
     send_message_to_subscribers,
+    get_app_name_and_register,
 )
 
 
@@ -143,6 +144,9 @@ def watch(app_name):
     m.add_subscribers(ids=telegram_subscribers)
 
     try:
+        app_name, _ = get_app_name_and_register(
+            app_name=app_name, register_location=register_location
+        )
         status_file = get_status_file(
             app_name=app_name, register_location=register_location
         )
@@ -150,9 +154,9 @@ def watch(app_name):
         print(f'Failed to retrieve status file for {app_name}. Error: {e}')
 
     try:
-        e = Executor(status_file)
+        e = Executor(status_file=status_file, meta_info={'app': app_name})
         e.add_messanger(m)
-        e.process()
+        e.process(cycle_period=10)
     except ExecutorException as ee:
         print(f'Failed to start {app_name}. Error: {ee}')
 

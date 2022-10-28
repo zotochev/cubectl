@@ -1,5 +1,4 @@
 import json
-import os
 import requests
 from pydantic import BaseModel
 from typing import Union, Protocol
@@ -52,7 +51,7 @@ class TelegramMessanger:
 
         for subscriber in self._subscribers:
             body = self._create_body(message=message, chat_id=subscriber)
-            send_message(request=body)
+            send_message(request=body, telegram_token=self._token)
 
     @staticmethod
     def _prepare_message(message: dict) -> str:

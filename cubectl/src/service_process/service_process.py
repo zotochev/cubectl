@@ -84,6 +84,9 @@ class ServiceProcess:
     def is_service(self):
         return self._init_config.service
 
+    def is_fail_restart_loop(self) -> bool:
+        return self.state is ProcessState.failed_start_loop
+
     def _status_collect_system_data(self) -> SystemData:
         """
         pid: Optional[int]

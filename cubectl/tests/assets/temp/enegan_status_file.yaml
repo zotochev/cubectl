@@ -1,5 +1,4 @@
-jobs:
-  get_report: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/enegan_status_report.yaml
+jobs: {}
 services:
 - init_config:
     arguments:
@@ -16,7 +15,7 @@ services:
     service: true
   service_data:
     nginx_config: null
-    port: 1239
+    port: 1243
   system_data:
     error_code: null
     pid: null
@@ -35,7 +34,7 @@ services:
     service: true
   service_data:
     nginx_config: null
-    port: 1240
+    port: 1244
   system_data:
     error_code: null
     pid: null
