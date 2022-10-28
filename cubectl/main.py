@@ -214,7 +214,14 @@ def setup_nginx(app_name, apply):
 @cli.command('message')
 @click.argument('text', default='default')
 def message(text):
-    send_message_to_subscribers(text)
+    telegram_token = os.environ['CUBECTL_TELEGRAM_TOKEN']
+    telegram_subscribers = os.environ['CUBECTL_TELEGRAM_CHAT_IDS'].split(',')
+
+    send_message_to_subscribers(
+        message=text,
+        telegram_chat_ids=telegram_subscribers,
+        telegram_token=telegram_token,
+    )
 
 
 if __name__ == '__main__':

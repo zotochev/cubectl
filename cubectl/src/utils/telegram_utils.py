@@ -80,7 +80,7 @@ def make_post_request(url: str, json_body: dict):
     return r.json(), r.status_code
 
 
-def send_message(request: Union[SendMessageSimplified, dict]):
+def send_message(telegram_token, request: Union[SendMessageSimplified, dict]):
     """
     request:
         {
@@ -95,8 +95,6 @@ def send_message(request: Union[SendMessageSimplified, dict]):
         request = SendMessageSimplified(**request)
     else:
         raise TypeError(f'Wrong request type: {type(request)}')
-
-    telegram_token = os.getenv('CUBECTL_TELEGRAM_TOKEN')
 
     if telegram_token is None:
         raise ValueError(
@@ -113,15 +111,7 @@ def send_message(request: Union[SendMessageSimplified, dict]):
     return response, status_code
 
 
-def send_message_to_subscribers(message: Union[str, dict]):
-    """
-
-    TELEGRAM_CHAT_IDS=464332561
-
-    :param message:
-    :return:
-    """
-    telegram_chat_ids = os.getenv('CUBECTL_TELEGRAM_CHAT_IDS')
+def send_message_to_subscribers(message: Union[str, dict], telegram_chat_ids, telegram_token):
 
     if telegram_chat_ids is None:
         raise ValueError(
@@ -135,4 +125,4 @@ def send_message_to_subscribers(message: Union[str, dict]):
             'chat_id': subscriber,
             'text': json.dumps(message)
         }
-        send_message(request=message_body)
+        send_message(request=message_body, telegram_token=telegram_token)
