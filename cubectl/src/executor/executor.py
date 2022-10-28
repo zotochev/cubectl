@@ -2,10 +2,11 @@ import logging
 from pathlib import Path
 import yaml
 from time import sleep
-from typing import Optional
+from typing import Optional, Union
 
 from src.service_process import ServiceProcess
 from src.models.setup_status import ProcessStatus, SetupStatus
+from src.utils import Messanger
 
 
 log = logging.getLogger(__file__)
@@ -22,12 +23,14 @@ class Executor:
     Applies changes from state file
     """
 
-    def __init__(self, status_file: str):
+    def __init__(self, status_file: str, app_name: str = 'default'):
         self._status_file = Path(status_file).resolve(strict=True)
         self._validate_status_file(self._status_file)
 
         self._status_file_last_change = int(self._status_file.stat().st_mtime)
         self._processes = self._setup_processes()
+        self._messanger: Optional[Messanger] = None
+        self._app_name = app_name
 
     @staticmethod
     def _validate_status_file(status_file: Path):
@@ -126,3 +129,18 @@ class Executor:
                 self._update_processes()
 
             sleep(cycle_period)
+
+    def add_messanger(self, messanger: Messanger):
+        self._messanger = messanger
+
+    def _message_process_status(self, process: ServiceProcess, note: str = None):
+        if not self._messanger:
+            return
+
+        message = {
+            'app': self._app_name,
+            'process_name': process.name,
+            'state': process.state,
+            'note': note,
+        }
+        self._messanger.post(message=message)

@@ -16,7 +16,9 @@ from src.utils import (
     read_yaml,
     check_service_names_for_duplicates,
     check_if_launched_as_root,
-    format_report
+    format_report,
+    TelegramMessanger,
+    send_message_to_subscribers,
 )
 
 
@@ -134,6 +136,11 @@ def watch(app_name):
     """
 
     status_file = None
+    telegram_token = os.getenv('CUBECTL_TELEGRAM_TOKEN')
+    telegram_subscribers = os.getenv('CUBECTL_TELEGRAM_CHAT_IDS')
+
+    m = TelegramMessanger(token=telegram_token)
+    m.add_subscribers(ids=telegram_subscribers)
 
     try:
         status_file = get_status_file(
@@ -144,6 +151,7 @@ def watch(app_name):
 
     try:
         e = Executor(status_file)
+        e.add_messanger(m)
         e.process()
     except ExecutorException as ee:
         print(f'Failed to start {app_name}. Error: {ee}')
@@ -201,6 +209,12 @@ def setup_nginx(app_name, apply):
             nginx_config_file,
             nginx_config_file.replace('sites-available', 'sites-enabled')
         )
+
+
+@cli.command('message')
+@click.argument('text', default='default')
+def message(text):
+    send_message_to_subscribers(text)
 
 
 if __name__ == '__main__':
