@@ -15,7 +15,7 @@ services:
     service: true
   service_data:
     nginx_config: null
-    port: 1243
+    port: 1245
   system_data:
     error_code: null
     pid: null
@@ -34,7 +34,7 @@ services:
     service: true
   service_data:
     nginx_config: null
-    port: 1244
+    port: 1246
   system_data:
     error_code: null
     pid: null

@@ -8,12 +8,11 @@ __all__ = [
 
 
 class InitProcessConfig(BaseModel):
-    name: Optional[str]
-    # command: Optional[str]                # deprecated
+    name: str
 
-    executor: str = ''
-    file: str = ''                         # cubectl/tests/example_services/example_service_0.py'
-    arguments: Optional[dict]              # {'--name': 'new_name'}
+    executor: str
+    file: str                             # cubectl/tests/example_services/example_service_0.py'
+    arguments: dict = dict()              # {'--name': 'new_name'}
 
     environment: dict[str, str] = dict()  # list of env variables
     env_files: list[str] = list()         # list of env files

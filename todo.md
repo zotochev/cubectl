@@ -51,5 +51,5 @@ Class that keeps `ServiceProcess` instances, reads `status file` and impacts on 
   - [x] Restart process if failed.
   - [ ] Stop restarting process after some number of attempts.
     - [ ] create algorithm using max_attempts, current_attempt, count_attempt
-  - [ ] Send message to telegram in some cases.
+  - [x] Send message to telegram in some cases.
 - [x] Saving report for `status` command.

@@ -119,7 +119,7 @@ class Executor:
 
     def _health_check(self):
         for process in self._processes:
-            if process.is_fail_restart_loop() or True:
+            if process.is_fail_restart_loop():
                 self._message_process_status(process=process)
 
     def _get_status(self):
