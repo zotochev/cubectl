@@ -1,0 +1,17 @@
+[project]
+name = "cubectl"
+version = "0.0.1"
+ dynamic = ["dependencies"]
+requires-python = ">=3.9"
+
+[project.scripts]
+cubectl = "cubectl:cli"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+cubectl = ["config.yaml"]

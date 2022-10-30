@@ -1,9 +1,10 @@
 from pathlib import Path
-from src.utils import read_yaml
+from cubectl.src.utils import read_yaml
 
 
 try:
-    config = read_yaml('config.yaml')
+    script_root = Path(__file__).parent.parent
+    config = read_yaml(Path(script_root, 'config.yaml'))
 except FileNotFoundError:
     # tests
     config = read_yaml('assets/utils_tests/config.yaml')

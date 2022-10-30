@@ -1,0 +1,32 @@
+#
+# Common
+#
+
+#applications_register: '/tmp/cubectl_applications_register.yaml'
+applications_register: '/home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/cubectl_applications_register.yaml'
+
+default_status_files_dir: '/tmp'
+
+# port from which ports assigning starts
+init_port_number: 9300
+temp_dir: /tmp/cubectl
+
+
+#
+# Configurator
+#
+
+# `status` command from Configurator
+# waiting retry period (one cycle)
+report_retry_wait_time: 0.1
+report_number_of_cycles: 50
+#report_location: '/tmp'
+report_location: '/home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/'
+
+
+#
+# Executor
+#
+
+# number of retries for starting up application
+start_retries_number: 10    # not used yet

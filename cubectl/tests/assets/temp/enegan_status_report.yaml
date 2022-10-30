@@ -14,11 +14,11 @@ service_0:
     service: true
   service_data:
     nginx_config: ''
-    port: 1239
+    port: 9303
   system_data:
     error_code: null
-    pid: 702296
-    started_at: '2022-10-25 16:32:59.942171'
+    pid: 54651
+    started_at: '2022-10-30 11:23:51.115980'
     state: STARTED
 service_1:
   init_config:
@@ -34,9 +34,9 @@ service_1:
     service: true
   service_data:
     nginx_config: ''
-    port: 1240
+    port: 9304
   system_data:
     error_code: null
-    pid: 702299
-    started_at: '2022-10-25 16:33:00.245991'
+    pid: 54652
+    started_at: '2022-10-30 11:23:51.519553'
     state: STARTED

@@ -14,9 +14,10 @@
   - [ ] stops all applications
   - [ ] deletes temp files and directories
 
-- [ ] `fclean`
+- [ ] `fclean` command
   - [ ] launch `clean` command 
   - [ ] deletes nginx config
+- [ ] `get-apps` command
 
 ---
 ## ServiceProcess

@@ -1,2 +1,2 @@
-from src.executor.executor import Executor
-from src.executor.executor import ExecutorException
+from cubectl.src.executor.executor import Executor
+from cubectl.src.executor.executor import ExecutorException

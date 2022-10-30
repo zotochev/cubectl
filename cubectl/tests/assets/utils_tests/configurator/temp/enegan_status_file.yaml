@@ -21,7 +21,7 @@ services:
     error_code: null
     pid: null
     started_at: null
-    state: STARTED
+    state: STOPPED
 - init_config:
     arguments:
       --name: name_1
@@ -40,4 +40,4 @@ services:
     error_code: null
     pid: null
     started_at: null
-    state: STARTED
+    state: STOPPED

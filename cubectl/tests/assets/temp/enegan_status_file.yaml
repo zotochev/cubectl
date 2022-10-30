@@ -15,12 +15,12 @@ services:
     service: true
   service_data:
     nginx_config: null
-    port: 1245
+    port: 9307
   system_data:
     error_code: null
     pid: null
     started_at: null
-    state: STARTED
+    state: STOPPED
 - init_config:
     arguments:
       --name: name_1
@@ -34,9 +34,9 @@ services:
     service: true
   service_data:
     nginx_config: null
-    port: 1246
+    port: 9308
   system_data:
     error_code: null
     pid: null
     started_at: null
-    state: STARTED
+    state: STOPPED

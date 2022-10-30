@@ -1,1 +1,1 @@
-from src.service_process.service_process import ServiceProcess
+from cubectl.src.service_process.service_process import ServiceProcess

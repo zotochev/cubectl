@@ -2,9 +2,9 @@ import yaml
 from pathlib import Path
 import logging
 
-from src.utils import resolve_path
+from cubectl.src.utils import resolve_path
 
-from src.models import (
+from cubectl.src.models import (
     RegisterEntity,
     InitFileModel,
     SetupStatus,
@@ -48,6 +48,7 @@ def register_application(
 
     with register_path.open('w') as f:
         yaml.dump(register, f, Dumper=yaml.Dumper)
+        log.warning(f'cubectl: application_registration: status_file: {status_file}, registered in: {register_path}')
 
 
 def init_service_status(root_dir, process_init_config: InitProcessConfig):

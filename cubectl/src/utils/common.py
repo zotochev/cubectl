@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 
 def read_yaml(
-        config_path: str,
+        config_path: Union[str, Path],
         validation_model: Optional[pydantic.main.ModelMetaclass] = None
 ):
     """Function to read STATIC config files."""

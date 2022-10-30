@@ -9,11 +9,11 @@ from pathlib import Path
 
 import dotenv
 
-from src.models import InitProcessConfig
-from src.models import ProcessState
-from src.models import ProcessStatus
-from src.models import SystemData
-from src.models import ServiceData
+from cubectl.src.models import InitProcessConfig
+from cubectl.src.models import ProcessState
+from cubectl.src.models import ProcessStatus
+from cubectl.src.models import SystemData
+from cubectl.src.models import ServiceData
 
 
 OS_OPERATIONS_DELAY = 0.1

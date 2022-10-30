@@ -4,11 +4,11 @@ import logging
 from functools import reduce
 from time import sleep
 
-from src.utils import read_yaml
-from src.initialization_functions import register_application
-from src.initialization_functions import create_status_object
+from cubectl.src.utils import read_yaml
+from cubectl.src.initialization_functions import register_application
+from cubectl.src.initialization_functions import create_status_object
 
-from src.models import InitFileModel, ProcessState, SetupStatus
+from cubectl.src.models import InitFileModel, ProcessState, SetupStatus
 
 
 log = logging.getLogger(__file__)

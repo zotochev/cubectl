@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, validator
 
-from src.models.init_process import InitProcessConfig
+from cubectl.src.models.init_process import InitProcessConfig
 
 
 __all__ = [

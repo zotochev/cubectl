@@ -4,9 +4,9 @@ import yaml
 from time import sleep
 from typing import Optional
 
-from src.service_process import ServiceProcess
-from src.models.setup_status import ProcessStatus
-from src.utils import Messanger
+from cubectl.src.service_process import ServiceProcess
+from cubectl.src.models.setup_status import ProcessStatus
+from cubectl.src.utils import Messanger
 
 
 log = logging.getLogger(__file__)
@@ -89,6 +89,11 @@ class Executor:
             if process.name in services or not services:
                 process.restart()
 
+    def _stop_all_processes(self):
+        for process in self._processes:
+            process: ServiceProcess
+            process.stop()
+
     def _do_jobs(self, jobs: dict):
         factory = {
             'get_report': self._send_report,
@@ -137,13 +142,16 @@ class Executor:
         return False
 
     def process(self, cycle_period: int = 1):
-        while True:
-            if self._is_status_file_changed():
-                self._update_processes()
+        try:
+            while True:
+                if self._is_status_file_changed():
+                    self._update_processes()
 
-            self._health_check()
+                self._health_check()
 
-            sleep(cycle_period)
+                sleep(cycle_period)
+        except KeyboardInterrupt:
+            self._stop_all_processes()
 
     def add_messanger(self, messanger: Messanger):
         self._messanger = messanger

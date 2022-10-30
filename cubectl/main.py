@@ -4,11 +4,11 @@ import click
 from pathlib import Path
 import dotenv
 
-from src.configurator import Configurator, ConfiguratorException
-from src.executor import Executor, ExecutorException
+from cubectl.src.configurator import Configurator, ConfiguratorException
+from cubectl.src.executor import Executor, ExecutorException
 
-from src import config, register_location
-from src.utils import (
+from cubectl.src import config, register_location
+from cubectl.src.utils import (
     resolve_path,
     get_status_file,
     create_nginx_config,
@@ -55,7 +55,7 @@ def init(init_file: str):
     """
 
     init_file = resolve_path(
-        root_dir=Path.cwd(), file_path=init_file, return_dir=False
+        root_dir=None, file_path=init_file, return_dir=False
     )
     try:
         configurator.init(init_file=init_file, reinit=True)
@@ -128,7 +128,8 @@ def status(app_name: str):
 
 @cli.command('watch')
 @click.argument('app_name', default='default')
-def watch(app_name):
+@click.option('--check', '-c', default=1, help='Period of checking processes status')
+def watch(app_name, check):
     """
     Starts monitoring for initializated services
 
@@ -156,7 +157,7 @@ def watch(app_name):
     try:
         e = Executor(status_file=status_file, meta_info={'app': app_name})
         e.add_messanger(m)
-        e.process(cycle_period=10)
+        e.process(cycle_period=check)
     except ExecutorException as ee:
         print(f'Failed to start {app_name}. Error: {ee}')
 

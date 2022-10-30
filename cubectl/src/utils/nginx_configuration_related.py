@@ -3,7 +3,7 @@ import os
 import logging
 from typing import Optional
 
-from src.utils import read_yaml
+from cubectl.src.utils import read_yaml
 
 
 log = logging.getLogger(__file__)
