@@ -9,7 +9,7 @@ toy.py
 cover/
 build/
 docs/_build
-requests.egg-info/
+cubectl.egg-info/
 *.pyc
 *.swp
 *.egg
@@ -20,6 +20,7 @@ env/
 .pytest_cache/
 .vscode/
 .eggs/
+*.eggs/
 
 .workon
 
