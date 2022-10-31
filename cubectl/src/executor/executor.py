@@ -10,6 +10,7 @@ from cubectl.src.utils import Messanger
 
 
 log = logging.getLogger(__file__)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class ExecutorException(Exception):
@@ -146,7 +147,7 @@ class Executor:
 
         try:
             while True:
-                if self._is_status_file_changed() or first_cycle:
+                if self._is_status_file_changed() or first_cycle or True:
                     first_cycle = False
                     self._update_processes()
 

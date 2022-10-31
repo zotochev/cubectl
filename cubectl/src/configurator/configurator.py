@@ -12,7 +12,7 @@ from cubectl.src.models import InitFileModel, ProcessState, SetupStatus
 
 
 log = logging.getLogger(__file__)
-
+logging.basicConfig(level=logging.DEBUG)
 
 class ConfiguratorException(Exception):
     pass
@@ -48,6 +48,7 @@ class Configurator:
         try:
             return register_dict[app_name]
         except KeyError:
+            log.error(f'cubectl: configurator: app: {app_name} not found.')
             return list(register_dict.values())[0]
 
     def _get_all_allocated_ports_by_app(self):
@@ -220,8 +221,10 @@ class Configurator:
 
         """
 
-        app_name = app_name + '_' if app_name else ''
-        report_file = f'{report_location}/{app_name}status_report.yaml'.replace('//', '/')
+        app_name_ = app_name + '_' if app_name else ''
+        report_file = f'{report_location}/{app_name_}status_report.yaml'.replace('//', '/')
+        log.warning(f"cubectl: configurator: creating report: {report_file}")
+
         register = self._get_app_register(app_name=app_name)
         status_file = Path(
             register['status_file']
@@ -236,6 +239,7 @@ class Configurator:
         report_file_path = Path(report_file)
         report_file_path.touch()
 
+        log.warning(f"cubectl: configurator: updating status file: {status_file}")
         with status_file.open('w') as new_status_file:
             yaml.dump(status.dict(), new_status_file)
 

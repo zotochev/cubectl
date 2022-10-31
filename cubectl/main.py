@@ -3,6 +3,7 @@ import os
 import click
 from pathlib import Path
 import dotenv
+import logging
 
 from cubectl.src.configurator import Configurator, ConfiguratorException
 from cubectl.src.executor import Executor, ExecutorException
@@ -25,6 +26,7 @@ from cubectl.src.utils import (
 
 configurator = Configurator(config)
 dotenv.load_dotenv()
+log = logging.getLogger(__file__)
 
 
 @click.group()
@@ -120,6 +122,7 @@ def status(app_name: str):
     """
 
     try:
+        log.warning(f'cubectl: status: getting status for app_name: {app_name}')
         report = configurator.status(app_name=app_name, report_location=config['report_location'])
         print(format_report(report))
     except ConfiguratorException as ce:
@@ -155,6 +158,7 @@ def watch(app_name, check):
         print(f'Failed to retrieve status file for {app_name}. Error: {e}')
 
     try:
+        log.debug(f'cubectl: main: creating Executor for app: {app_name}, with arguments: {status_file=}; {app_name=}')
         e = Executor(status_file=status_file, meta_info={'app': app_name})
         e.add_messanger(m)
         e.process(cycle_period=check)
