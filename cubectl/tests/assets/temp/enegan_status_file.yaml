@@ -1,4 +1,5 @@
-jobs: {}
+jobs:
+  get_report: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/v3_status_report.yaml
 services:
 - init_config:
     arguments:
@@ -20,7 +21,7 @@ services:
     error_code: null
     pid: null
     started_at: null
-    state: STOPPED
+    state: STARTED
 - init_config:
     arguments:
       --name: name_1
@@ -39,4 +40,4 @@ services:
     error_code: null
     pid: null
     started_at: null
-    state: STOPPED
+    state: STARTED

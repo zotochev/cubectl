@@ -142,9 +142,12 @@ class Executor:
         return False
 
     def process(self, cycle_period: int = 1):
+        first_cycle = True
+
         try:
             while True:
-                if self._is_status_file_changed():
+                if self._is_status_file_changed() or first_cycle:
+                    first_cycle = False
                     self._update_processes()
 
                 self._health_check()

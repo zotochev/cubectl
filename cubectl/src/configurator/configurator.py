@@ -220,7 +220,6 @@ class Configurator:
 
         """
 
-        _ = self
         app_name = app_name + '_' if app_name else ''
         report_file = f'{report_location}/{app_name}status_report.yaml'.replace('//', '/')
         register = self._get_app_register(app_name=app_name)
