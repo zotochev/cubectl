@@ -37,3 +37,4 @@ dist
 
 /.mypy_cache/
 .env
+services.yaml
