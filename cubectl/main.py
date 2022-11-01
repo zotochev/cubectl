@@ -258,6 +258,7 @@ def setup_nginx(app_name, apply, file):
     else:
         print(nginx_config)
 
+    # todo uncomment in case implementation of --apply argument
     # if apply:
     #     os.symlink(
     #         nginx_config_file,
