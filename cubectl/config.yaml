@@ -3,7 +3,7 @@
 #
 
 #applications_register: '/tmp/cubectl_applications_register.yaml'
-applications_register: '/home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/cubectl_applications_register.yaml'
+applications_register: '/tmp/cubectl/cubectl_applications_register.yaml'
 
 default_status_files_dir: '/tmp'
 
@@ -21,7 +21,7 @@ temp_dir: /tmp/cubectl
 report_retry_wait_time: 0.1
 report_number_of_cycles: 50
 #report_location: '/tmp'
-report_location: '/home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/'
+report_location: '/tmp/cubectl/'
 
 
 #
