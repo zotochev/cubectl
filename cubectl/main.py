@@ -201,11 +201,11 @@ def watch(app_name, check):
         print(f'Failed to start {app_name}. Error: {ee}')
 
 
-@cli.command('setup-nginx')
+@cli.command('get-nginx-config')
 @click.option('--apply', default=False, is_flag=True)
 @click.option('--file', default=False, is_flag=True)
 @click.argument('app_name', default='default')
-def setup_nginx(app_name, apply, file):
+def get_nginx_config(app_name, apply, file):
     """
     Create nginx config file for services from init file.
 

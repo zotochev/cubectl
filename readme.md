@@ -38,3 +38,15 @@ You can get example of init file by executing following command:
    ```bash
    cubectl get-init-file-example
    ```
+
+## Setting up nginx configuration
+You can get nginx config file by executing:
+```bash
+cubectl get-nginx-config [installation_name]
+```
+
+To apply file to nginx directly you can use:
+```bash
+sudo bash -c "echo \"$(cubectl setup-nginx)\" > /etc/nginx/sites-available/cubectl.conf"
+sudo ln -s /etc/nginx/sites-available/cubectl.conf /etc/nginx/sites-enabled/cubectl.conf
+```
