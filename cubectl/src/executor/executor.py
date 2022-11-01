@@ -39,6 +39,7 @@ class Executor:
         self._processes = self._setup_processes()
         self._messanger: Optional[Messanger] = None
         self._meta_info = meta_info
+        self._last_job = None
 
     @staticmethod
     def _validate_status_file(status_file: Path):
@@ -107,7 +108,12 @@ class Executor:
     def _update_processes(self):
         status = self._get_status()
 
-        self._do_jobs(status.get('jobs', {}))
+        jobs: dict = status.get('jobs', {})
+        if jobs:
+            new_job_id = list(jobs.keys())[0]
+            if new_job_id != self._last_job:
+                self._last_job = new_job_id
+                self._do_jobs(jobs=jobs[new_job_id])
 
         for process_status in status.get('services', []):
             init_config = process_status['init_config']

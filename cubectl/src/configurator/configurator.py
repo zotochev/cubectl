@@ -3,6 +3,7 @@ from pathlib import Path
 import logging
 from functools import reduce
 from time import sleep
+import uuid
 
 from cubectl.src.utils import read_yaml
 from cubectl.src.initialization_functions import register_application
@@ -212,7 +213,9 @@ class Configurator:
         )
 
         status.jobs = {
-            'restart': ','.join(services)
+            str(uuid.uuid4()): {
+                'restart': ','.join(services)
+            }
         }
         with status_file.open('w') as new_status_file:
             yaml.dump(status.dict(), new_status_file)
@@ -238,8 +241,11 @@ class Configurator:
         )
 
         status.jobs = {
-            'get_report': report_file
+            str(uuid.uuid4()): {
+                'get_report': report_file
+            }
         }
+
         report_file_path = Path(report_file)
         report_file_path.touch()
 
