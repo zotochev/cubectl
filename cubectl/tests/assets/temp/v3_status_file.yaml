@@ -1,6 +1,4 @@
-jobs:
-  89a958c3-f573-4468-85c4-5f0d92d9c727:
-    get_report: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/v3_status_report.yaml
+jobs: {}
 services:
 - init_config:
     arguments:

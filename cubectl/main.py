@@ -220,8 +220,14 @@ def get_nginx_config(app_name, apply, file):
 
     # if apply and not check_if_launched_as_root():
     if apply:
-        # raise Exception('cubectl: setup-nginx: to apply run as the root user.')
-        raise Exception('cubectl: setup-nginx: apply option not implemented.')
+        nginx_apply_instruction = (
+            'sudo bash -c "echo \"$(cubectl setup-nginx)\" > /etc/nginx/cubectl.conf"\n'
+            'sudo ln -s /etc/nginx/sites-available/cubectl.conf /etc/nginx/sites-enabled/cubectl.conf\n'
+        )
+        log.warning(f'cubectl: get-nginx-config: --apply option not '
+                    f'implemented. You can try to use:\n'
+                    f'{nginx_apply_instruction}'
+                    )
 
     status_file = get_status_file(
         app_name=app_name, register_location=register_location
