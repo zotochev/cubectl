@@ -8,3 +8,4 @@ from cubectl.src.utils.nginx_configuration_related import (
 )
 from cubectl.src.utils.format_report import format_report
 from cubectl.src.utils.telegram_utils import Messanger, TelegramMessanger, send_message_to_subscribers
+from cubectl.src.utils.colors import color

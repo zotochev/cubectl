@@ -1,0 +1,63 @@
+documents:
+  init_config:
+    arguments:
+      -p: 9101
+      -s: documents
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    name: documents
+    port: 9101
+    service: true
+  service_data:
+    nginx_config: ''
+    port: 9101
+  system_data:
+    error_code: null
+    pid: 4475
+    started_at: '2022-11-01 08:00:57.389744'
+    state: STARTED
+flows:
+  init_config:
+    arguments:
+      -p: 9102
+      -s: flows
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    name: flows
+    port: 9102
+    service: true
+  service_data:
+    nginx_config: ''
+    port: 9102
+  system_data:
+    error_code: null
+    pid: 4476
+    started_at: '2022-11-01 08:00:57.590889'
+    state: STARTED
+tenants:
+  init_config:
+    arguments:
+      -p: 9100
+      -s: tenants
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    name: tenants
+    port: 9100
+    service: true
+  service_data:
+    nginx_config: ''
+    port: 9100
+  system_data:
+    error_code: null
+    pid: 4474
+    started_at: '2022-11-01 08:00:57.188835'
+    state: STARTED

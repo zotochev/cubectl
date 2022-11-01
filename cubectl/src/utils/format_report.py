@@ -1,4 +1,5 @@
 import datetime
+from cubectl.src.utils import color
 
 
 def chop_microseconds(delta):
@@ -63,7 +64,7 @@ def format_report(report: dict) -> str:
             ('Workers', workers)
     ):
         if p_array:
-            result += template.format(*(p_name, '', '', '', ''))
+            result += template.format(*(f'{color.underline}{p_name}{color.end}', '', '', '', ''))
         for process in p_array:
             result += template.format(*[str(x) for x in process])
 

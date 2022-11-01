@@ -123,7 +123,7 @@ def status(app_name: str):
     """
 
     try:
-        log.warning(f'cubectl: status: getting status for app_name: {app_name}')
+        log.debug(f'cubectl: status: getting status for app_name: {app_name}')
         report = configurator.status(app_name=app_name, report_location=config['report_location'])
         print(format_report(report))
     except ConfiguratorException as ce:

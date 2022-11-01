@@ -1,0 +1,63 @@
+jobs:
+  get_report: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp/v3_status_report.yaml
+services:
+- init_config:
+    arguments:
+      -p: 9100
+      -s: tenants
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    name: tenants
+    port: 9100
+    service: true
+  service_data:
+    nginx_config: null
+    port: 9100
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED
+- init_config:
+    arguments:
+      -p: 9101
+      -s: documents
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    name: documents
+    port: 9101
+    service: true
+  service_data:
+    nginx_config: null
+    port: 9101
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED
+- init_config:
+    arguments:
+      -p: 9102
+      -s: flows
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    name: flows
+    port: 9102
+    service: true
+  service_data:
+    nginx_config: null
+    port: 9102
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED
