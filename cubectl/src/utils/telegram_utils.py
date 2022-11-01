@@ -64,11 +64,7 @@ class TelegramMessanger:
         # transform non python types to strings
         if isinstance(message, dict):
             for key in message_copy.keys():
-                print()
-                print(type(message_copy[key]).__name__)
-                print()
                 if getattr(builtins, type(message_copy[key]).__name__, None) is None:
-                    print('---')
                     message_copy[key] = str(message_copy[key])
 
         with io.StringIO() as s:
