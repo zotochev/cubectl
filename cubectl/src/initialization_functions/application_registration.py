@@ -31,10 +31,12 @@ def register_application(
 ):
     """Writes new application to register.yaml file."""
 
+
     init_config = InitFileModel(**init_config)
+    app_name = init_config.installation_name
     register_path = Path(register_path)
     entity = RegisterEntity(
-        app_name=init_config.installation_name,
+        app_name=app_name,
         status_file=status_file,
     )
 
@@ -45,6 +47,12 @@ def register_application(
             register_from_file = yaml.load(f, Loader=yaml.FullLoader)
 
     register = register_from_file if register_from_file else list()
+    registered_apps = [x['app_name'] for x in register]
+
+    if app_name in registered_apps:
+        log.warning(f'cubectl: application_registration: application {app_name} overriden in register')
+        register = [x for x in register if x['app_name'] != app_name]
+
     register.append(entity.dict())
 
     with register_path.open('w') as f:

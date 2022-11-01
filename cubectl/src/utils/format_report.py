@@ -1,5 +1,5 @@
 import datetime
-from cubectl.src.utils import color
+from .colors import color
 
 
 def chop_microseconds(delta):
@@ -14,9 +14,10 @@ def get_up_time(started_at: str):
     return str(chop_microseconds(up_time))
 
 
-def format_report(report: dict) -> str:
+def format_report(report: dict, app_name: str = None) -> str:
     """
     Arguments:
+        app_name: installation name.
         report: dictionary returned by status command
             format: {<service_name>: <service_info>}
 
@@ -31,7 +32,9 @@ def format_report(report: dict) -> str:
           get_sim_info   started                123           00:23:41
     """
     result = ''
-    template = '{:<15}|{:<15}|{:<15}|{:<15}|{:<15}\n'
+    if app_name:
+        result += f'Installation: {app_name}\n'
+    template = '{:<15}{:<15}{:<15}{:<15}{:<15}\n'
     header = ('Name', 'State', 'Pid', 'Port', 'Uptime')
     workers = []
     services = []
@@ -64,8 +67,13 @@ def format_report(report: dict) -> str:
             ('Workers', workers)
     ):
         if p_array:
-            result += template.format(*(f'{color.underline}{p_name}{color.end}', '', '', '', ''))
+            result += template.format(*(f'{color.bold}{p_name}{color.end}', '', '', '', ''))
         for process in p_array:
-            result += template.format(*[str(x) for x in process])
+            result += template.format(
+                *[
+                    str(x)
+                    for x in process
+                ]
+            )
 
     return result

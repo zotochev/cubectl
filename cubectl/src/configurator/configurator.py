@@ -30,17 +30,17 @@ class Configurator:
         self._config = config
         self._app_register = config.get('applications_register', '/tmp/cubectl_application_register.yaml')
 
-    def _get_register(self) -> dict:
-        register = Path(self._app_register).resolve()
-        if not register.is_file():
+    def _get_register(self) -> list:
+        register_path = Path(self._app_register).resolve()
+        if not register_path.is_file():
             raise ConfiguratorException('cubectl: No register found.')
 
-        with register.open() as f:
-            register_dict: dict = yaml.load(f, Loader=yaml.FullLoader)
-            if not register_dict:
+        with register_path.open() as f:
+            register: list = yaml.load(f, Loader=yaml.FullLoader)
+            if not register:
                 raise ConfiguratorException('cubectl: Register is empty.')
 
-        return register_dict
+        return register
 
     def _get_app_register(self, app_name: str) -> dict:
         register_list = self._get_register()
@@ -130,6 +130,7 @@ class Configurator:
             status_file=str(status_file),
             register_path=self._app_register,
         )
+
         status_object = create_status_object(
             init_config=init_config.dict(),
         )
@@ -223,7 +224,7 @@ class Configurator:
 
         """
 
-        app_name_ = app_name + '_' if app_name else ''
+        app_name_ = app_name + '_' if app_name and app_name else ''
         report_file = f'{report_location}/{app_name_}status_report.yaml'.replace('//', '/')
         log.debug(f"cubectl: configurator: creating report: {report_file}")
 

@@ -25,7 +25,15 @@ def get_status_file(app_name, register_location) -> str:
     return status_file
 
 
-def get_app_name_and_register(app_name, register_location) -> (str, str):
+AppName = str
+RegisterLocation = str
+
+
+def get_app_name_and_register(
+        app_name,
+        register_location,
+        get_default_if_not_found=True
+) -> (AppName, RegisterLocation):
     try:
         with Path(register_location).open() as f:
             register: dict = yaml.load(f, Loader=yaml.Loader)
@@ -41,10 +49,15 @@ def get_app_name_and_register(app_name, register_location) -> (str, str):
 
     registered_apps = [x['app_name'] for x in register]
 
-    if app_name in (None, 'default'):
+    if app_name in (None, 'default', 'all'):
         app_name = register[0]['app_name']
 
     if app_name not in registered_apps:
+        if get_default_if_not_found:
+            log.warning(
+                f'cubectl: application {app_name} not found in register. Assigning app name: {register[0]["app_name"]}'
+            )
+            return register[0]['app_name'], register
         raise ModuleNotFoundError(
             f'cubectl: application {app_name} not found in register. '
             f'Try to call cubectl_init before().'

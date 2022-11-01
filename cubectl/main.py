@@ -75,6 +75,15 @@ def start(app_name: str, services: tuple):
         app_name: [Optional] Application name
         services: tuple of services names from init_file
     """
+    app_name_resolved, _ = get_app_name_and_register(
+        app_name=app_name,
+        register_location=register_location,
+        get_default_if_not_found=True,
+    )
+
+    if app_name_resolved not in ('all', None, 'default', app_name):
+        services = [*services, app_name]
+        app_name = app_name_resolved
 
     try:
         configurator.start(app_name=app_name, services=services)
@@ -92,7 +101,17 @@ def stop(app_name: str, services: tuple):
         services: tuple of services names from init_file
     """
 
+    app_name_resolved, _ = get_app_name_and_register(
+        app_name=app_name,
+        register_location=register_location,
+        get_default_if_not_found=True,
+    )
+
+    if app_name_resolved not in ('all', None, 'default', app_name):
+        services = [*services, app_name]
+        app_name = app_name_resolved
     try:
+        log.debug(f'cubectl: main: stopping services: {services}; In app: {app_name}')
         configurator.stop(app_name=app_name, services=services)
     except ConfiguratorException as ce:
         print(f"Failed to stop {app_name}: {ce}")
@@ -108,6 +127,15 @@ def restart(app_name: str, services: tuple):
         services: tuple of services names from init_file
     """
 
+    app_name_resolved, _ = get_app_name_and_register(
+        app_name=app_name,
+        register_location=register_location,
+        get_default_if_not_found=True,
+    )
+
+    if app_name_resolved not in ('all', None, 'default', app_name):
+        services = [*services, app_name]
+        app_name = app_name_resolved
     try:
         configurator.restart(app_name=app_name, services=services)
     except ConfiguratorException as ce:
@@ -115,17 +143,20 @@ def restart(app_name: str, services: tuple):
 
 
 @cli.command('status')
-@click.argument('app_name', default=None)
+@click.argument('app_name', default='default')
 def status(app_name: str):
     """
     Arguments:
         app_name: [Optional] Application name
     """
+    app_name, _ = get_app_name_and_register(
+        app_name=app_name, register_location=register_location
+    )
 
     try:
         log.debug(f'cubectl: status: getting status for app_name: {app_name}')
         report = configurator.status(app_name=app_name, report_location=config['report_location'])
-        print(format_report(report))
+        print(format_report(report=report, app_name=app_name))
     except ConfiguratorException as ce:
         print(f"Failed to get status for {app_name}: {ce}")
 
@@ -140,6 +171,9 @@ def watch(app_name, check):
     Arguments:
         app_name:
     """
+    app_name, _ = get_app_name_and_register(
+        app_name=app_name, register_location=register_location
+    )
 
     status_file = None
     telegram_token = os.getenv('CUBECTL_TELEGRAM_TOKEN')
@@ -149,9 +183,6 @@ def watch(app_name, check):
     m.add_subscribers(ids=telegram_subscribers)
 
     try:
-        app_name, _ = get_app_name_and_register(
-            app_name=app_name, register_location=register_location
-        )
         status_file = get_status_file(
             app_name=app_name, register_location=register_location
         )
@@ -178,6 +209,9 @@ def setup_nginx(app_name, apply):
         app_name:
         apply:
     """
+    app_name, _ = get_app_name_and_register(
+        app_name=app_name, register_location=register_location
+    )
 
     if apply and not check_if_launched_as_root():
         raise Exception('cubectl: setup-nginx: to apply run as the root user.')
@@ -185,9 +219,9 @@ def setup_nginx(app_name, apply):
     status_file = get_status_file(
         app_name=app_name, register_location=register_location
     )
-    status = read_yaml(status_file)
+    status_dict = read_yaml(status_file)
     services = [
-        x for x in status.get('services', [])
+        x for x in status_dict.get('services', [])
         if x['init_config']['service']
     ]
 
@@ -219,6 +253,25 @@ def setup_nginx(app_name, apply):
             nginx_config_file,
             nginx_config_file.replace('sites-available', 'sites-enabled')
         )
+
+
+@cli.command('get-apps')
+def get_apps():
+    """
+    Returns list of applications registered in register.
+    """
+
+    log.debug(f'cubectl: main: getting app list from {register_location}')
+
+    app_name, register = get_app_name_and_register(
+        app_name=None, register_location=register_location
+    )
+    apps = [f'* {x["app_name"]}' for x in register]
+    if apps:
+        print("Registered applications:")
+        print(*apps, sep='\n')
+    else:
+        print('Applications not found.')
 
 
 @cli.command('message')

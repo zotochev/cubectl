@@ -15,10 +15,10 @@ documents:
     nginx_config: ''
     port: 9101
   system_data:
-    error_code: null
-    pid: 17765
-    started_at: '2022-11-01 09:36:03.921254'
-    state: STARTED
+    error_code: -555
+    pid: null
+    started_at: None
+    state: STOPPED
 flows:
   init_config:
     arguments:
@@ -36,10 +36,10 @@ flows:
     nginx_config: ''
     port: 9102
   system_data:
-    error_code: null
-    pid: 17806
-    started_at: '2022-11-01 09:36:26.721945'
-    state: STARTED
+    error_code: -555
+    pid: null
+    started_at: None
+    state: STOPPED
 tenants:
   init_config:
     arguments:
@@ -57,7 +57,7 @@ tenants:
     nginx_config: ''
     port: 9100
   system_data:
-    error_code: null
-    pid: 17764
-    started_at: '2022-11-01 09:36:03.720366'
-    state: STARTED
+    error_code: -555
+    pid: null
+    started_at: None
+    state: STOPPED
