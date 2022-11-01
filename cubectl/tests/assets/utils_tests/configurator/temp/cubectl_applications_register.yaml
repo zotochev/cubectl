@@ -1,2 +1,22 @@
-enegan:
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml
+- app_name: enegan
   status_file: assets/utils_tests/configurator/temp/enegan_status_file.yaml

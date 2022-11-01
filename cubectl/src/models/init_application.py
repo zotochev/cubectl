@@ -11,7 +11,8 @@ __all__ = [
 
 
 class RegisterEntity(BaseModel):
-    status_file: str = '/tmp/default_name_status_file.yaml'
+    app_name: str
+    status_file: str
 
 
 class InitFileModel(BaseModel):

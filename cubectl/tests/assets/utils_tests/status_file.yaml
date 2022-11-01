@@ -19,6 +19,7 @@ services:
   system_data:
     error_code: null
     pid: null
+    started_at: null
     state: STOPPED
 - init_config:
     arguments:
@@ -37,4 +38,5 @@ services:
   system_data:
     error_code: null
     pid: null
+    started_at: null
     state: STOPPED

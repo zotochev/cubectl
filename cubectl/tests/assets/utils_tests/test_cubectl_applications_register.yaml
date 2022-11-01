@@ -1,2 +1,16 @@
-enegan:
+- app_name: enegan
+  status_file: assets/utils_tests/status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/status_file.yaml
+- app_name: enegan
+  status_file: assets/utils_tests/status_file.yaml
+- app_name: enegan
   status_file: assets/utils_tests/status_file.yaml

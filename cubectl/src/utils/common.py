@@ -45,7 +45,7 @@ def resolve_path(
     elif file_path is None:
         resolved_path = Path(root_dir)
     elif root_dir is None or not str(root_dir).startswith('/'):
-        log.warning(f'cubectl: common: resolve_path: invalid root dir: {root_dir}')
+        log.debug(f'cubectl: common: resolve_path: invalid root dir: {root_dir}')
         resolved_path = Path(file_path).resolve()
     else:
         resolved_path = Path(root_dir, file_path)

@@ -10,7 +10,6 @@ from cubectl.src.utils import Messanger
 
 
 log = logging.getLogger(__file__)
-logging.basicConfig(level=logging.DEBUG)
 
 
 class ExecutorException(Exception):

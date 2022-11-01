@@ -12,7 +12,7 @@ from cubectl.src.models import InitFileModel, ProcessState, SetupStatus
 
 
 log = logging.getLogger(__file__)
-logging.basicConfig(level=logging.DEBUG)
+
 
 class ConfiguratorException(Exception):
     pass
@@ -43,19 +43,21 @@ class Configurator:
         return register_dict
 
     def _get_app_register(self, app_name: str) -> dict:
-        register_dict = self._get_register()
+        register_list = self._get_register()
+        if not register_list:
+            raise ConfiguratorException(f'cubectl: configurator: no apps found in register')
 
-        try:
-            return register_dict[app_name]
-        except KeyError:
-            log.error(f'cubectl: configurator: app: {app_name} not found.')
-            return list(register_dict.values())[0]
+        for app in register_list:
+            if app['app_name'] == app_name:
+                return app
+        log.debug(f'cubectl: configurator: app: {app_name} not found.')
+        return register_list[0]
 
     def _get_all_allocated_ports_by_app(self):
         register = self._get_register()
         ports_by_app = dict()
 
-        for app_name in register.keys():
+        for app_name in (x['app_name'] for x in register):
             try:
                 status = self._get_status(app_name)
             except FileNotFoundError:
@@ -223,7 +225,7 @@ class Configurator:
 
         app_name_ = app_name + '_' if app_name else ''
         report_file = f'{report_location}/{app_name_}status_report.yaml'.replace('//', '/')
-        log.warning(f"cubectl: configurator: creating report: {report_file}")
+        log.debug(f"cubectl: configurator: creating report: {report_file}")
 
         register = self._get_app_register(app_name=app_name)
         status_file = Path(
@@ -239,7 +241,7 @@ class Configurator:
         report_file_path = Path(report_file)
         report_file_path.touch()
 
-        log.warning(f"cubectl: configurator: updating status file: {status_file}")
+        log.debug(f"cubectl: configurator: updating status file: {status_file}")
         with status_file.open('w') as new_status_file:
             yaml.dump(status.dict(), new_status_file)
 

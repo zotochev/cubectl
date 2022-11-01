@@ -26,6 +26,7 @@ from cubectl.src.utils import (
 
 configurator = Configurator(config)
 dotenv.load_dotenv()
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__file__)
 
 

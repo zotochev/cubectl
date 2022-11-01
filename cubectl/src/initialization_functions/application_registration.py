@@ -34,6 +34,7 @@ def register_application(
     init_config = InitFileModel(**init_config)
     register_path = Path(register_path)
     entity = RegisterEntity(
+        app_name=init_config.installation_name,
         status_file=status_file,
     )
 
@@ -43,12 +44,12 @@ def register_application(
         with register_path.open() as f:
             register_from_file = yaml.load(f, Loader=yaml.FullLoader)
 
-    register = register_from_file if register_from_file else dict()
-    register[init_config.installation_name] = entity.dict()
+    register = register_from_file if register_from_file else list()
+    register.append(entity.dict())
 
     with register_path.open('w') as f:
         yaml.dump(register, f, Dumper=yaml.Dumper)
-        log.warning(f'cubectl: application_registration: status_file: {status_file}, registered in: {register_path}')
+        log.debug(f'cubectl: application_registration: status_file: {status_file}, registered in: {register_path}')
 
 
 def init_service_status(root_dir, process_init_config: InitProcessConfig):

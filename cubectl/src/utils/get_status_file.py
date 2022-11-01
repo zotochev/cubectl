@@ -10,7 +10,11 @@ def get_status_file(app_name, register_location) -> str:
     app_name, register = get_app_name_and_register(
         app_name=app_name, register_location=register_location
     )
-    status_file = register[app_name]['status_file']
+    status_file = None
+
+    for app in register:
+        if app['app_name'] == app_name:
+            status_file = app['status_file']
 
     if not Path(status_file).is_file():
         log.warning(
@@ -35,14 +39,12 @@ def get_app_name_and_register(app_name, register_location) -> (str, str):
             'cubectl: no applications registered (register is empty)'
         )
 
-    if app_name in (None, 'default'):
-        log.warning(
-            'cubectl: get_status_file: app_name choosed automatically '
-            'from not ordered type dict.'
-        )
-        app_name = list(register.keys())[0]
+    registered_apps = [x['app_name'] for x in register]
 
-    if app_name not in register:
+    if app_name in (None, 'default'):
+        app_name = register[0]['app_name']
+
+    if app_name not in registered_apps:
         raise ModuleNotFoundError(
             f'cubectl: application {app_name} not found in register. '
             f'Try to call cubectl_init before().'
