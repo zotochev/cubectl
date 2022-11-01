@@ -25,7 +25,8 @@ from cubectl.src.utils import (
 
 
 configurator = Configurator(config)
-dotenv.load_dotenv()
+# dotenv.load_dotenv(dotenv_path=Path(Path(__file__).parent, '.env'))
+# dotenv.load_dotenv()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__file__)
 
@@ -179,8 +180,10 @@ def watch(app_name, check):
     telegram_token = os.getenv('CUBECTL_TELEGRAM_TOKEN')
     telegram_subscribers = os.getenv('CUBECTL_TELEGRAM_CHAT_IDS')
 
-    m = TelegramMessanger(token=telegram_token)
-    m.add_subscribers(ids=telegram_subscribers)
+    m = None
+    if telegram_token:
+        m = TelegramMessanger(token=telegram_token)
+        m.add_subscribers(ids=telegram_subscribers)
 
     try:
         status_file = get_status_file(

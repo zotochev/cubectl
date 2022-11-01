@@ -34,8 +34,8 @@ def format_report(report: dict, app_name: str = None) -> str:
     result = ''
     if app_name:
         result += f'Installation: {app_name}\n'
-    template = '{:<15}{:<15}{:<15}{:<15}{:<15}\n'
-    header = ('Name', 'State', 'Pid', 'Port', 'Uptime')
+    header = ('Name', 'State', 'Pid', 'Port', 'Uptime', 'ErrorCode')
+    template = '{:<20}' * 2 + '{:<10}' * (len(header) - 2) + '\n'
     workers = []
     services = []
     if report is None:
@@ -45,29 +45,38 @@ def format_report(report: dict, app_name: str = None) -> str:
     for service_name, service_info in report.items():
         name = service_name
         state = service_info['system_data']['state']
+
         pid = ''
         if service_info['system_data']['error_code'] is None:
             pid = service_info['system_data']['pid']
-        port = service_info['service_data']['port']
+
+        error_code = ''
+        if service_info['system_data']['error_code'] is not None:
+            error_code = service_info['system_data']['error_code']
+
+        port = ''
+        if service_info['service_data']['port']:
+            port = service_info['service_data']['port']
+
         started_at = service_info['system_data']['started_at']
+
         uptime = ''
         if started_at is not None and started_at != 'None':
             uptime = get_up_time(started_at)
+
+        row = (name, state, pid, port, uptime, error_code)
         if service_info['init_config']['service']:
-            services.append(
-                (name, state, pid, port, uptime)
-            )
+            services.append(row)
         else:
-            workers.append(
-                (name, state, pid, '', uptime)
-            )
+            workers.append(row)
 
     for p_name, p_array in (
             ('Services', services),
             ('Workers', workers)
     ):
         if p_array:
-            result += template.format(*(f'{color.bold}{p_name}{color.end}', '', '', '', ''))
+            header_row = [f'{color.bold}{p_name}{color.end}', *['' for _ in range(len(header) - 1)]]
+            result += template.format(*header_row)
         for process in p_array:
             result += template.format(
                 *[

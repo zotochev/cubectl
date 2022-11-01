@@ -167,6 +167,7 @@ class Executor:
 
     def _message_process_status(self, process: ServiceProcess, note: str = None):
         if not self._messanger:
+            log.warning('cubectl: executor: no messanger was supplied.')
             return
 
         message = {

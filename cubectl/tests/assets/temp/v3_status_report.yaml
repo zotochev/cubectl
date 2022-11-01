@@ -16,15 +16,16 @@ documents:
     port: 9101
   system_data:
     error_code: null
-    pid: 26213
-    started_at: '2022-11-01 10:31:06.845384'
+    pid: 38916
+    started_at: '2022-11-01 12:06:58.623567'
     state: STARTED
 dummy_worker:
   init_config:
     arguments: {}
     dotenv: true
     env_files: []
-    environment: {}
+    environment:
+      PYTHONPATH: /home/mikhail/Documents/work/labs/src
     executor: /home/mikhail/Documents/work/labs/.venv/bin/python
     file: /home/mikhail/Documents/work/labs/src/workers/dummy_worker.py
     name: dummy_worker
@@ -34,10 +35,10 @@ dummy_worker:
     nginx_config: ''
     port: null
   system_data:
-    error_code: null
-    pid: 28975
-    started_at: '2022-11-01 10:52:55.896212'
-    state: STARTED
+    error_code: 1
+    pid: 39025
+    started_at: None
+    state: FAILED_START_LOOP
 flows:
   init_config:
     arguments:
@@ -56,8 +57,32 @@ flows:
     port: 9102
   system_data:
     error_code: null
-    pid: 26214
-    started_at: '2022-11-01 10:31:07.046615'
+    pid: 38917
+    started_at: '2022-11-01 12:06:58.824741'
+    state: STARTED
+telegram_worker:
+  init_config:
+    arguments: {}
+    dotenv: true
+    env_files: []
+    environment:
+      PYTHONPATH: /home/mikhail/Documents/work/labs/src
+      REDIS_HOST: localhost
+      REDIS_MESSAGES_QUEUE: cubectl_telegram
+      REDIS_PORT: '6379'
+      TELEGRAM_TOKEN: 5305034368:AAGnUkZKTlo5mx2DXHrcEercrL9q6SpH3GU
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/workers/telegram.py
+    name: telegram_worker
+    port: null
+    service: false
+  service_data:
+    nginx_config: ''
+    port: null
+  system_data:
+    error_code: null
+    pid: 38918
+    started_at: '2022-11-01 12:06:59.034034'
     state: STARTED
 tenants:
   init_config:
@@ -77,6 +102,6 @@ tenants:
     port: 9100
   system_data:
     error_code: null
-    pid: 26212
-    started_at: '2022-11-01 10:31:06.644377'
+    pid: 38914
+    started_at: '2022-11-01 12:06:58.421879'
     state: STARTED
