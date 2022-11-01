@@ -17,7 +17,10 @@
 - [ ] `fclean` command
   - [ ] launch `clean` command 
   - [ ] deletes nginx config
+
 - [ ] `get-apps` command
+- [ ] redo register from dict to list
+- [ ] fix tests
 
 ---
 ## ServiceProcess

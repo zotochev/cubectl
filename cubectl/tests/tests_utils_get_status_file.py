@@ -56,5 +56,6 @@ class TestUtilsGetStatusFile(unittest.TestCase):
     def test_get_register_ng(self):
         try:
             a = get_status_file(app_name=None, register_location=self.register_location_ng)
-        except TypeError:
-            pass
+        except (TypeError, KeyError):
+            return
+        self.assertTrue(False)
