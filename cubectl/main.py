@@ -203,21 +203,25 @@ def watch(app_name, check):
 
 @cli.command('setup-nginx')
 @click.option('--apply', default=False, is_flag=True)
+@click.option('--file', default=False, is_flag=True)
 @click.argument('app_name', default='default')
-def setup_nginx(app_name, apply):
+def setup_nginx(app_name, apply, file):
     """
     Create nginx config file for services from init file.
 
     Arguments:
         app_name:
         apply:
+        file:
     """
     app_name, _ = get_app_name_and_register(
         app_name=app_name, register_location=register_location
     )
 
-    if apply and not check_if_launched_as_root():
-        raise Exception('cubectl: setup-nginx: to apply run as the root user.')
+    # if apply and not check_if_launched_as_root():
+    if apply:
+        # raise Exception('cubectl: setup-nginx: to apply run as the root user.')
+        raise Exception('cubectl: setup-nginx: apply option not implemented.')
 
     status_file = get_status_file(
         app_name=app_name, register_location=register_location
@@ -247,15 +251,18 @@ def setup_nginx(app_name, apply):
     if check_if_launched_as_root():
         nginx_config_file = '/etc/nginx/sites-available/' + nginx_config_file
 
-    with Path(nginx_config_file).open('w') as f:
-        print('writing to ', nginx_config_file)
-        f.write(nginx_config)
+    if file:
+        with Path(nginx_config_file).open('w') as f:
+            print('writing to ', nginx_config_file)
+            f.write(nginx_config)
+    else:
+        print(nginx_config)
 
-    if apply:
-        os.symlink(
-            nginx_config_file,
-            nginx_config_file.replace('sites-available', 'sites-enabled')
-        )
+    # if apply:
+    #     os.symlink(
+    #         nginx_config_file,
+    #         nginx_config_file.replace('sites-available', 'sites-enabled')
+    #     )
 
 
 @cli.command('get-apps')
