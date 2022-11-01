@@ -16,8 +16,8 @@ documents:
     port: 9101
   system_data:
     error_code: null
-    pid: 38916
-    started_at: '2022-11-01 12:06:58.623567'
+    pid: 50821
+    started_at: '2022-11-01 13:29:03.929298'
     state: STARTED
 dummy_worker:
   init_config:
@@ -35,10 +35,10 @@ dummy_worker:
     nginx_config: ''
     port: null
   system_data:
-    error_code: 1
-    pid: 39025
-    started_at: None
-    state: FAILED_START_LOOP
+    error_code: null
+    pid: 51252
+    started_at: '2022-11-01 13:30:54.453985'
+    state: STARTED
 flows:
   init_config:
     arguments:
@@ -57,8 +57,8 @@ flows:
     port: 9102
   system_data:
     error_code: null
-    pid: 38917
-    started_at: '2022-11-01 12:06:58.824741'
+    pid: 50822
+    started_at: '2022-11-01 13:29:04.130474'
     state: STARTED
 telegram_worker:
   init_config:
@@ -81,8 +81,8 @@ telegram_worker:
     port: null
   system_data:
     error_code: null
-    pid: 38918
-    started_at: '2022-11-01 12:06:59.034034'
+    pid: 50823
+    started_at: '2022-11-01 13:29:04.331731'
     state: STARTED
 tenants:
   init_config:
@@ -102,6 +102,6 @@ tenants:
     port: 9100
   system_data:
     error_code: null
-    pid: 38914
-    started_at: '2022-11-01 12:06:58.421879'
+    pid: 50820
+    started_at: '2022-11-01 13:29:03.728378'
     state: STARTED

@@ -9,13 +9,13 @@ tear_down_commands: []    # not implemented
 #   worker (service: false): only starts up
 
 # if `root_dir: null` location of this file is assumed as root directory
-# root_dir should be absolut (starts from eg: `/home/admin`)
+# root_dir should be absolut (starts from eg: `/home/admin`) otherwise it ignored
 root_dir: null
 
-status_file_dir: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp
-
+status_file_dir: /tmp/cubectl
 
 # each process follows InitProcessConfig
+# mandatory arguments are: name, executor, file
 processes:
   - name: service_0
 
@@ -31,7 +31,7 @@ processes:
     dotenv: false       # if true (default true) tries to load .env file near command file
 
     service: true       # if true (default false) assigns port and nginx config
-#    port: 1234
+    port: 1234
 
   - name: service_1
 
@@ -41,4 +41,4 @@ processes:
       '--name': 'name_1'
 
     service: true
-#    port: 1234
+    port: 1235

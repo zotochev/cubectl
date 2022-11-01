@@ -1,7 +1,11 @@
+import io
+
+import yaml
 import json
 import requests
 from pydantic import BaseModel
 from typing import Union, Protocol
+import builtins
 import logging
 
 
@@ -55,7 +59,21 @@ class TelegramMessanger:
 
     @staticmethod
     def _prepare_message(message: dict) -> str:
-        return json.dumps(message, indent=2)
+        message_copy = message.copy()
+
+        # transform non python types to strings
+        if isinstance(message, dict):
+            for key in message_copy.keys():
+                print()
+                print(type(message_copy[key]).__name__)
+                print()
+                if getattr(builtins, type(message_copy[key]).__name__, None) is None:
+                    print('---')
+                    message_copy[key] = str(message_copy[key])
+
+        with io.StringIO() as s:
+            yaml.dump(message_copy, s)
+            return s.getvalue()
 
     @staticmethod
     def _create_body(message, chat_id):

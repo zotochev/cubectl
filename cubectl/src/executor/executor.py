@@ -159,7 +159,7 @@ class Executor:
                 self._health_check()
 
                 sleep(cycle_period)
-        except KeyboardInterrupt:
+        except (Exception, KeyboardInterrupt):
             self._stop_all_processes()
 
     def add_messanger(self, messanger: Messanger):

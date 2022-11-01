@@ -20,8 +20,16 @@ OS_OPERATIONS_DELAY = 0.1
 log = logging.getLogger(__file__)
 
 
+class ServiceProcessException(Exception):
+    pass
+
+
+class ServiceProcessNoRetriesException(ServiceProcessException):
+    pass
+
+
 class ServiceProcess:
-    def __init__(self, init_config: dict):
+    def __init__(self, init_config: dict, number_of_start_retries: int = 10):
         self._init_config = InitProcessConfig(**init_config)
         self._start_up_command: list[str] = _create_start_up_command(
             executor=self._init_config.executor,
@@ -39,10 +47,18 @@ class ServiceProcess:
         if self._init_config.service:
             if self._init_config.port:
                 self._port = self._init_config.port
+        self._number_of_start_retries = number_of_start_retries
+        self._number_of_start_retries_left = number_of_start_retries
 
     def start(self):
         self._check_process()
         if self._state is ProcessState.started:
+            return
+        if self._state is ProcessState.failed_to_start:
+            log.warning(
+                f'cubectl: ServiceProcess: {self.name} is in {self._state} state. '
+                f'Try to restart before process'
+            )
             return
 
         self._process = Popen(
@@ -53,6 +69,10 @@ class ServiceProcess:
         self._check_process()
         if self._state is not ProcessState.started:
             self._state = ProcessState.failed_start_loop
+            try:
+                self._decrement_retries()
+            except ServiceProcessNoRetriesException:
+                self._state = ProcessState.failed_to_start
         else:
             self._process_started_at = datetime.now()
 
@@ -86,6 +106,16 @@ class ServiceProcess:
 
     def is_fail_restart_loop(self) -> bool:
         return self.state is ProcessState.failed_start_loop
+
+    def _reset_process_start_retries(self):
+        self._number_of_start_retries_left = self._number_of_start_retries
+
+    def _decrement_retries(self):
+        if self._number_of_start_retries_left == 0:
+            raise ServiceProcessNoRetriesException(
+                'cubectl: ServiceProces: no start up retries left.'
+            )
+        self._number_of_start_retries_left -= 1
 
     def _status_collect_system_data(self) -> SystemData:
         """
@@ -126,16 +156,24 @@ class ServiceProcess:
             self._process_stopped_at = datetime.now()
 
             self._process_started_at = None
-            if self._state is not ProcessState.failed_start_loop:
+            if (self._state is not ProcessState.failed_start_loop
+                    and self._state is not ProcessState.failed_to_start):
                 self._state = ProcessState.stopped
+            elif self.state is ProcessState.failed_start_loop and self._number_of_start_retries_left == 0:
+                self._state = ProcessState.failed_to_start
         else:
             self._state = ProcessState.started
         return error_code
 
     def stop(self):
+        self._reset_process_start_retries()
+
         if self.state is not ProcessState.stopped:
             if self._process is not None:
                 self._process.kill()
+        if (self.state is ProcessState.failed_start_loop
+                or self.state is ProcessState.failed_to_start):
+            self._state = ProcessState.stopped
         self._check_process()
 
     def restart(self):

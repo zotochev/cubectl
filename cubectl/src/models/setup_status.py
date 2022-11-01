@@ -18,6 +18,7 @@ class ProcessState(str, Enum):
     stopped = 'STOPPED'
     started = 'STARTED'
     failed_start_loop = 'FAILED_START_LOOP'
+    failed_to_start = 'FAILED_TO_START'
 
 
 class SystemData(BaseModel):

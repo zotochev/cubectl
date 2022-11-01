@@ -277,6 +277,15 @@ def get_apps():
         print('Applications not found.')
 
 
+@cli.command('get-init-file-example')
+def get_init_file_example():
+    log.debug(f'cubectl: main: getting init file example.')
+    example_file = Path(Path(__file__).parent, 'init-file-example.yaml')
+    if example_file.is_file():
+        print(example_file.read_text())
+    log.warning(f'cubectl: main: no init example found in {example_file}.')
+
+
 @cli.command('message')
 @click.argument('text', default='default')
 def message(text):
