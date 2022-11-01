@@ -18,7 +18,7 @@ python -m build && pip3 install .
 
 2. Start up watcher
     ```bash
-    cubectl watch [installation_name] [-c <number_of_seconds>]&
+    cubectl watch [installation_name] [-c <number_of_seconds>] &
     ```
    * `-c` option define how often watcher checks processes status
 
@@ -35,8 +35,8 @@ python -m build && pip3 install .
 ## Init file
 Init file is file that defines installation and describes which processes to start and how to start them.
 You can get example of init file by executing following command:
-   ```bash
-   cubectl get-init-file-example
+```bash
+cubectl get-init-file-example
    ```
 
 ## Setting up nginx configuration
