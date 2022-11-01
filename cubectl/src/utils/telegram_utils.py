@@ -59,6 +59,11 @@ class TelegramMessanger:
 
     @staticmethod
     def _prepare_message(message: dict) -> str:
+        """
+        Todo:
+            Add bold to dict keys.
+        """
+
         message_copy = message.copy()
 
         # transform non python types to strings
