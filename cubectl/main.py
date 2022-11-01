@@ -81,7 +81,7 @@ def start(app_name: str, services: tuple):
         get_default_if_not_found=True,
     )
 
-    if app_name_resolved not in ('all', None, 'default', app_name):
+    if app_name not in ('all', None, 'default', app_name_resolved):
         services = [*services, app_name]
         app_name = app_name_resolved
 
@@ -106,10 +106,10 @@ def stop(app_name: str, services: tuple):
         register_location=register_location,
         get_default_if_not_found=True,
     )
-
-    if app_name_resolved not in ('all', None, 'default', app_name):
+    if app_name not in ('all', None, 'default', app_name_resolved):
         services = [*services, app_name]
         app_name = app_name_resolved
+
     try:
         log.debug(f'cubectl: main: stopping services: {services}; In app: {app_name}')
         configurator.stop(app_name=app_name, services=services)
@@ -132,10 +132,10 @@ def restart(app_name: str, services: tuple):
         register_location=register_location,
         get_default_if_not_found=True,
     )
-
-    if app_name_resolved not in ('all', None, 'default', app_name):
+    if app_name not in ('all', None, 'default', app_name_resolved):
         services = [*services, app_name]
         app_name = app_name_resolved
+
     try:
         configurator.restart(app_name=app_name, services=services)
     except ConfiguratorException as ce:

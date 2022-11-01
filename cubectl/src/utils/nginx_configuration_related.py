@@ -44,21 +44,21 @@ def get_next_port(ports_allocated_by_app: dict) -> Optional[int]:
         return max(ports)
 
 
-def get_all_allocated_ports_by_app(register: dict):
+def get_all_allocated_ports_by_app(register: list):
     ports_by_app = dict()
 
-    for app_name in register.keys():
+    for app in (x for x in register):
         try:
-            status = read_yaml(register[app_name]['status_file'])
+            status = read_yaml(app['status_file'])
         except FileNotFoundError:
             log.warning(f"cubectl: get_all_allocated_ports_by_app: "
-                        f"status_file for {app_name}: "
-                        f"{register[app_name]['status_file']} not found."
+                        f"status_file for {app['app_name']}: "
+                        f"{app['status_file']} not found."
                         )
             continue
         except KeyError:
             log.warning(f"cubectl: get_all_allocated_ports_by_app: "
-                        f" key status_file for {app_name}: not found in register."
+                        f" key status_file for {app['app_name']}: not found in register."
                         )
             continue
         services = status.get('services', [])
@@ -76,11 +76,11 @@ def get_all_allocated_ports_by_app(register: dict):
                 log.error(
                     f'cubectl: get_all_allocated_ports: wrong structure for '
                     f'service instance in status file: '
-                    f'{register[app_name]["status_file"]} \n'
+                    f'{app["status_file"]} \n'
                     f'key error: {ke}'
                 )
                 raise
-        ports_by_app[app_name] = ports
+        ports_by_app[app['app_name']] = ports
 
     return ports_by_app
 

@@ -201,7 +201,7 @@ class Configurator:
         )
 
     def restart(self, app_name: str = None, services: tuple = tuple()):
-        app_name = app_name + '_' if app_name else ''
+        app_name_ = app_name + '_' if app_name else ''
         register = self._get_app_register(app_name=app_name)
         status_file = Path(
             register['status_file']
