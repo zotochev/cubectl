@@ -301,7 +301,8 @@ def get_init_file_example():
     example_file = Path(Path(__file__).parent, 'init-file-example.yaml')
     if example_file.is_file():
         print(example_file.read_text())
-    log.warning(f'cubectl: main: no init example found in {example_file}.')
+    else:
+        log.warning(f'cubectl: main: no init example found in {example_file}.')
 
 
 @cli.command('message')

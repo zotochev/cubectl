@@ -3,11 +3,15 @@ Utility for starting and controlling processes in unix environments.
 
 ## Requirements
 * setuptools
-* build (python module)
+* build (pip install build)
 
 ## Installation of cubectl
 ```bash
 python -m build && pip3 install .
+```
+For specific version of python
+```bash
+python3.9 -m build && python3.9 -m pip install .
 ```
 
 ## Usage
