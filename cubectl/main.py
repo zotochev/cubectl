@@ -280,10 +280,14 @@ def get_apps():
 
     log.debug(f'cubectl: main: getting app list from {register_location}')
 
-    app_name, register = get_app_name_and_register(
-        app_name=None, register_location=register_location
-    )
-    apps = [f'* {x["app_name"]}' for x in register]
+    try:
+        app_name, register = get_app_name_and_register(
+            app_name=None, register_location=register_location
+        )
+        apps = [f'* {x["app_name"]}' for x in register]
+    except FileNotFoundError:
+        apps = []
+
     if apps:
         print("Registered applications:")
         print(*apps, sep='\n')
