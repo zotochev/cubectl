@@ -191,17 +191,18 @@ class Configurator:
             yaml.dump(status, new_status_file)
 
     def start(self, app_name: str, services: tuple):
+        log.debug(f'cubectl: configurator: app: {app_name}; starting: {services}')
         self._change_process_state(
             app_name=app_name, services=services, state=ProcessState.started
         )
 
     def stop(self, app_name: str, services: tuple):
+        log.debug(f'cubectl: configurator: app: {app_name}; stopping: {services}')
         self._change_process_state(
             app_name=app_name, services=services, state=ProcessState.stopped
         )
 
     def restart(self, app_name: str = None, services: tuple = tuple()):
-        app_name_ = app_name + '_' if app_name else ''
         register = self._get_app_register(app_name=app_name)
         status_file = Path(
             register['status_file']

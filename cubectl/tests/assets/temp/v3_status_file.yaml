@@ -61,3 +61,19 @@ services:
     pid: null
     started_at: null
     state: STARTED
+- init_config:
+    arguments: {}
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/workers/dummy_worker.py
+    name: dummy_worker
+    port: null
+    service: false
+  service_data: null
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED

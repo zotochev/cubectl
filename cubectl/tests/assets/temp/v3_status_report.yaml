@@ -16,8 +16,27 @@ documents:
     port: 9101
   system_data:
     error_code: null
-    pid: 21570
-    started_at: '2022-11-01 10:00:48.249899'
+    pid: 24693
+    started_at: '2022-11-01 10:20:55.588589'
+    state: STARTED
+dummy_worker:
+  init_config:
+    arguments: {}
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: /home/mikhail/Documents/work/labs/.venv/bin/python
+    file: /home/mikhail/Documents/work/labs/src/workers/dummy_worker.py
+    name: dummy_worker
+    port: null
+    service: false
+  service_data:
+    nginx_config: ''
+    port: null
+  system_data:
+    error_code: null
+    pid: 24808
+    started_at: '2022-11-01 10:21:53.949401'
     state: STARTED
 flows:
   init_config:
@@ -37,8 +56,8 @@ flows:
     port: 9102
   system_data:
     error_code: null
-    pid: 21668
-    started_at: '2022-11-01 10:01:33.532868'
+    pid: 24695
+    started_at: '2022-11-01 10:20:55.789736'
     state: STARTED
 tenants:
   init_config:
@@ -58,6 +77,6 @@ tenants:
     port: 9100
   system_data:
     error_code: null
-    pid: 21569
-    started_at: '2022-11-01 10:00:48.048753'
+    pid: 24692
+    started_at: '2022-11-01 10:20:55.387719'
     state: STARTED

@@ -238,7 +238,7 @@ class ServiceProcess:
             to_restart = True
             self._make_follow_updated_init(desired_status.init_config)
 
-        if not self._compare_status_service_data(desired_status.service_data):
+        if self.is_service() and not self._compare_status_service_data(desired_status.service_data):
             to_restart = True
             self._make_follow_service_data(desired_status.service_data)
 
