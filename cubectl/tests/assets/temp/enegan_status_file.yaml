@@ -1,0 +1,87 @@
+jobs:
+  167fc9d6-c21b-437a-886a-d4782ba02657:
+    get_report:
+      report_file: /tmp/cubectl/enegan_status_report.yaml
+services:
+- init_config:
+    arguments:
+      --name: name_0
+    dotenv: false
+    env_files: []
+    environment:
+      FOO: BAR
+      ONE: ONE1
+    executor: python
+    file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
+    log: /home/mikhail/PycharmProjects/cubectl/cubectl/log0.log
+    name: service_0
+    port: null
+    service: true
+  service_data:
+    nginx_config: null
+    port: 9309
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED
+- init_config:
+    arguments:
+      --name: name_1
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: python
+    file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
+    log: /home/mikhail/PycharmProjects/cubectl/cubectl/log1.log
+    name: service_1
+    port: null
+    service: true
+  service_data:
+    nginx_config: null
+    port: 9310
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED
+- init_config:
+    arguments:
+      --name: name_2
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: python
+    file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
+    log: /home/mikhail/PycharmProjects/cubectl/cubectl/log1.log
+    name: service_2
+    port: null
+    service: true
+  service_data:
+    nginx_config: null
+    port: 9311
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED
+- init_config:
+    arguments:
+      --name: name_3
+    dotenv: true
+    env_files: []
+    environment: {}
+    executor: python
+    file: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/example_services/example_service_0.py
+    log: /home/mikhail/PycharmProjects/cubectl/cubectl/log1.log
+    name: service_3
+    port: null
+    service: true
+  service_data:
+    nginx_config: null
+    port: 9312
+  system_data:
+    error_code: null
+    pid: null
+    started_at: null
+    state: STARTED

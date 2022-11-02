@@ -86,3 +86,24 @@ def format_report(report: dict, app_name: str = None) -> str:
             )
 
     return result
+
+
+def format_logs_response(logs_response: dict, app_name: str = None) -> str:
+    if not logs_response:
+        return f"No logs found for {app_name}."
+
+    colors = [color.white, color.green, color.blue, color.cyan, color.magenta]
+
+    result = f"Installation: {app_name}\n"
+
+    for i, (service_name, service_logs) in enumerate(logs_response.items()):
+        result += colors[i % len(colors)]
+        result += service_name + '\n'
+        if service_logs.strip():
+            result += service_logs
+            result += '\n'
+        else:
+            result += 'No logs found.\n'
+        result += color.end
+
+    return result

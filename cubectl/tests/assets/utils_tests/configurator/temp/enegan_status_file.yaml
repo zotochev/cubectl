@@ -1,5 +1,6 @@
 jobs:
-  get_report: assets/utils_tests/configurator/temp/status_report.yaml
+  b542271e-cf6f-4812-ae87-507cd13a6371:
+    get_report: assets/utils_tests/configurator/temp/status_report.yaml
 services:
 - init_config:
     arguments:

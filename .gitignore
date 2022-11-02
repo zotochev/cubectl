@@ -13,6 +13,7 @@ cubectl.egg-info/
 *.pyc
 *.swp
 *.egg
+*.log
 env/
 .venv/
 .eggs/

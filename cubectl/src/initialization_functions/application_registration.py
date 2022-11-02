@@ -31,7 +31,6 @@ def register_application(
 ):
     """Writes new application to register.yaml file."""
 
-
     init_config = InitFileModel(**init_config)
     app_name = init_config.installation_name
     register_path = Path(register_path)
@@ -45,6 +44,9 @@ def register_application(
     if register_path.is_file():
         with register_path.open() as f:
             register_from_file = yaml.load(f, Loader=yaml.FullLoader)
+    else:
+        register_dir = register_path.parent
+        register_dir.mkdir(parents=True, exist_ok=True)
 
     register = register_from_file if register_from_file else list()
     registered_apps = [x['app_name'] for x in register]
@@ -105,6 +107,19 @@ def init_service_status(root_dir, process_init_config: InitProcessConfig):
     service_data = None
     if process_init_config.service:
         service_data = ServiceData(port=None)
+
+    if process_init_config.log:
+        resolved_log_path = resolve_path(
+           root_dir=root_dir, file_path=process_init_config.log, return_dir=False
+        )
+
+        if Path(resolved_log_path).is_file():
+            process_init_config.log = str(Path(resolved_log_path))
+        else:
+            log.warning(f'cubectl: application_registration: '
+                        f'log file {resolved_log_path} not found and replaced by None'
+                        )
+            process_init_config.log = None
 
     return ProcessStatus(
         init_config=process_init_config,

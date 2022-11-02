@@ -6,6 +6,7 @@ from cubectl.src.utils.nginx_configuration_related import (
     check_service_names_for_duplicates,
     check_if_launched_as_root,
 )
-from cubectl.src.utils.format_report import format_report
+from cubectl.src.utils.format_report import format_report, format_logs_response
 from cubectl.src.utils.telegram_utils import Messanger, TelegramMessanger, send_message_to_subscribers
 from cubectl.src.utils.colors import color
+from cubectl.src.utils.log_reader import LogReader, LogReaderProtocol

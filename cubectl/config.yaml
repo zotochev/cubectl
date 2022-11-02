@@ -21,7 +21,8 @@ temp_dir: /tmp/cubectl
 report_retry_wait_time: 0.1
 report_number_of_cycles: 50
 #report_location: '/tmp'
-report_location: '/tmp/cubectl/'
+report_location: '/tmp/cubectl'
+log_buffer_location: /tmp/cubectl
 
 
 #

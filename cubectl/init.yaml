@@ -31,6 +31,7 @@ processes:
     dotenv: false       # if true (default true) tries to load .env file near command file
 
     service: true       # if true (default false) assigns port and nginx config
+    log: log0.log
 #    port: 1234
 
   - name: service_1
@@ -41,4 +42,26 @@ processes:
       '--name': 'name_1'
 
     service: true
+    log: log1.log
+#    port: 1234
+
+  - name: service_2
+
+    executor: 'python'
+    file: 'tests/assets/example_services/example_service_0.py'
+    arguments:
+      '--name': 'name_2'
+
+    service: true
+    log: log1.log
+#    port: 1234
+  - name: service_3
+
+    executor: 'python'
+    file: 'tests/assets/example_services/example_service_0.py'
+    arguments:
+      '--name': 'name_3'
+
+    service: true
+    log: log1.log
 #    port: 1234

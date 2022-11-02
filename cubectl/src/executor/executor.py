@@ -75,6 +75,9 @@ class Executor:
             report[process.name] = process.status().dict()
 
         try:
+            report_file = Path(report_file)
+            if not report_file.parent.is_dir():
+                report_file.parent.mkdir(parents=True, exist_ok=True)
             with Path(report_file).open('w') as f:
                 yaml.dump(report, f)
         except Exception as e:
@@ -84,7 +87,7 @@ class Executor:
             )
 
     def restart(self, services: str):
-        services = [x for x in services.split(',') if x]
+        # services = [x for x in services.split(',') if x]
         for process in self._processes:
             process: ServiceProcess
             if process.name in services or not services:
@@ -98,12 +101,13 @@ class Executor:
     def _do_jobs(self, jobs: dict):
         factory = {
             'get_report': self._send_report,
+            'get_logs': self._send_logs,
             'restart': self.restart,
         }
 
         for method in factory:
             if method in jobs:
-                factory[method](jobs[method])
+                factory[method](**jobs[method])
 
     def _update_processes(self):
         status = self._get_status()
@@ -164,6 +168,22 @@ class Executor:
 
     def add_messanger(self, messanger: Messanger):
         self._messanger = messanger
+
+    def _send_logs(self, services: tuple, buffer_file: str, latest: bool = True):
+        if not services:
+            services = [x.name for x in self._processes]
+        logs = self._get_logs(services=services, latest=latest)
+
+        with Path(buffer_file).open('w') as f:
+            yaml.dump(logs, f)
+
+    def _get_logs(self, services: tuple, latest: bool = True) -> dict:
+        result = dict()
+        for process in self._processes:
+            if process.name in services:
+                process: ServiceProcess
+                result[process.name] = process.get_logs(latest=latest)
+        return result
 
     def _message_process_status(self, process: ServiceProcess, note: str = None):
         if not self._messanger:

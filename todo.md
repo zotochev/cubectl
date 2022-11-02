@@ -14,13 +14,11 @@
   - [ ] stops all applications
   - [ ] deletes temp files and directories
 
-- [ ] `fclean` command
-  - [ ] launch `clean` command 
-  - [ ] deletes nginx config
+- [x] `get-apps` command
+- [x] redo register from dict to list
+- [x] fix tests
+- [ ] `restart` wo arguments does not work
 
-- [ ] `get-apps` command
-- [ ] redo register from dict to list
-- [ ] fix tests
 
 ---
 ## ServiceProcess
@@ -45,6 +43,8 @@ Class for configuring applications `register`, creating and changing `status fil
   - [ ] Decide how port stored in to status file should be propagated to process itself:
     - [ ] Via env variable.
     - [ ] Via argument (--port 9006).
+- [ ] get `log`
+  - [ ] try to read stdout or stderr from popen object
 
 ---
 ## Executor

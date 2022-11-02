@@ -14,6 +14,7 @@ from cubectl.src.models import ProcessState
 from cubectl.src.models import ProcessStatus
 from cubectl.src.models import SystemData
 from cubectl.src.models import ServiceData
+from cubectl.src.utils import LogReaderProtocol, LogReader
 
 
 OS_OPERATIONS_DELAY = 0.1
@@ -49,6 +50,7 @@ class ServiceProcess:
                 self._port = self._init_config.port
         self._number_of_start_retries = number_of_start_retries
         self._number_of_start_retries_left = number_of_start_retries
+        self._log_reader: LogReaderProtocol = LogReader(self._init_config.log)
 
     def start(self):
         self._check_process()
@@ -287,8 +289,14 @@ class ServiceProcess:
             # usually no need to restart
             self._make_to_follow_system_data(desired_status.system_data)
 
-    def get_logs(self):
-        raise NotImplemented('service_process.py')
+    def get_logs(self, latest: bool = True):
+        try:
+            if latest:
+                return self._log_reader.get_latest_log()
+            return self._log_reader.get_log()
+        except Exception as e:
+            log.critical(f'cubectl: service_process: log_reader failed with error: {e}')
+            return ''
 
     def get_log_level(self):
         raise NotImplemented('service_process.py')

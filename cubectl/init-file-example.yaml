@@ -32,6 +32,7 @@ processes:
 
     service: true       # if true (default false) assigns port and nginx config
     port: 1234
+    log: log0.log
 
   - name: service_1
 
@@ -42,3 +43,4 @@ processes:
 
     service: true
     port: 1235
+    log: log1.log

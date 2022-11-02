@@ -2,8 +2,8 @@ import os
 
 import click
 from pathlib import Path
-import dotenv
 import logging
+from pprint import pprint
 
 from cubectl.src.configurator import Configurator, ConfiguratorException
 from cubectl.src.executor import Executor, ExecutorException
@@ -18,6 +18,7 @@ from cubectl.src.utils import (
     check_service_names_for_duplicates,
     check_if_launched_as_root,
     format_report,
+    format_logs_response,
     TelegramMessanger,
     send_message_to_subscribers,
     get_app_name_and_register,
@@ -25,8 +26,6 @@ from cubectl.src.utils import (
 
 
 configurator = Configurator(config)
-# dotenv.load_dotenv(dotenv_path=Path(Path(__file__).parent, '.env'))
-# dotenv.load_dotenv()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__file__)
 
@@ -156,8 +155,47 @@ def status(app_name: str):
 
     try:
         log.debug(f'cubectl: status: getting status for app_name: {app_name}')
-        report = configurator.status(app_name=app_name, report_location=config['report_location'])
+        report = configurator.status(
+            app_name=app_name,
+            report_location=config['report_location'],
+        )
         print(format_report(report=report, app_name=app_name))
+    except ConfiguratorException as ce:
+        print(f"Failed to get status for {app_name}: {ce}")
+
+
+@cli.command('logs')
+@click.argument('app_name', default='default')
+@click.argument('services', nargs=-1)
+@click.option('--full', default=False, is_flag=True)
+def logs(app_name: str, services: tuple, full: bool):
+    """
+    Arguments:
+        app_name: [Optional] Application name
+        services:
+        full: if not supplied only new logs will be showed.
+    """
+    app_name_resolved, _ = get_app_name_and_register(
+        app_name=app_name,
+        register_location=register_location,
+        get_default_if_not_found=True,
+    )
+    if app_name not in ('all', None, 'default', app_name_resolved):
+        services = [*services, app_name]
+        app_name = app_name_resolved
+
+    try:
+        log.debug(f'cubectl: logs: getting logs for app_name: {app_name}')
+        report = configurator.get_logs(
+            app_name=app_name,
+            services=services,
+            logs_buffer_dir=config['log_buffer_location'],
+            latest=(not full),
+        )
+        if isinstance(report, dict):
+            print(format_logs_response(logs_response=report, app_name=app_name))
+        else:
+            print(report)
     except ConfiguratorException as ce:
         print(f"Failed to get status for {app_name}: {ce}")
 
@@ -171,6 +209,7 @@ def watch(app_name, check):
 
     Arguments:
         app_name:
+        check: Period of checking processes status.
     """
     app_name, _ = get_app_name_and_register(
         app_name=app_name, register_location=register_location
@@ -228,6 +267,7 @@ def get_nginx_config(app_name, apply, file):
                     f'implemented. You can try to use:\n'
                     f'{nginx_apply_instruction}'
                     )
+        file = True
 
     status_file = get_status_file(
         app_name=app_name, register_location=register_location
@@ -259,7 +299,7 @@ def get_nginx_config(app_name, apply, file):
 
     if file:
         with Path(nginx_config_file).open('w') as f:
-            print('writing to ', nginx_config_file)
+            print('Nginx config created: ', nginx_config_file)
             f.write(nginx_config)
     else:
         print(nginx_config)

@@ -31,58 +31,8 @@ class Configurator:
         self._config = config
         self._app_register = config.get('applications_register', '/tmp/cubectl_application_register.yaml')
 
-    def _get_register(self) -> list:
-        register_path = Path(self._app_register).resolve()
-        if not register_path.is_file():
-            raise ConfiguratorException('cubectl: No register found.')
-
-        with register_path.open() as f:
-            register: list = yaml.load(f, Loader=yaml.FullLoader)
-            if not register:
-                raise ConfiguratorException('cubectl: Register is empty.')
-
-        return register
-
-    def _get_app_register(self, app_name: str) -> dict:
-        register_list = self._get_register()
-        if not register_list:
-            raise ConfiguratorException(f'cubectl: configurator: no apps found in register')
-
-        for app in register_list:
-            if app['app_name'] == app_name:
-                return app
-        log.debug(f'cubectl: configurator: app: {app_name} not found.')
-        return register_list[0]
-
-    def _get_all_allocated_ports_by_app(self):
-        register = self._get_register()
-        ports_by_app = dict()
-
-        for app_name in (x['app_name'] for x in register):
-            try:
-                status = self._get_status(app_name)
-            except FileNotFoundError:
-                continue
-            services = status.get('services', [])
-            ports = []
-            for service in services:
-                service_data = service['service_data']
-                if not service_data:
-                    continue
-                ports.append(service_data['port'])
-            ports_by_app[app_name] = ports
-        return ports_by_app
-
-    def _get_status(self, app_name: str):
-        register = self._get_app_register(app_name=app_name)
-        status_file = Path(register['status_file'])
-
-        with status_file.open() as f:
-            result = yaml.load(f, Loader=yaml.FullLoader)
-        return result if result else dict()
-
     def _assign_ports_to_services(self, status):
-        ports_by_app = self._get_all_allocated_ports_by_app()
+        ports_by_app = _get_all_allocated_ports_by_app(app_register=self._app_register)
         allocated_ports = []
         if not ports_by_app:
             pass
@@ -142,6 +92,7 @@ class Configurator:
             status_file = Path(status_file, '')
 
         if Path(status_file).is_file() and not reinit:
+            log.warning('cubectl: main: init: status file was not overriden because reinit=False.')
             return
 
         with open(status_file, 'w') as f:
@@ -165,11 +116,11 @@ class Configurator:
             * save new status file
         """
 
-        register = self._get_app_register(app_name=app_name)
+        register = _get_app_register(app_name=app_name, app_register=self._app_register)
         status_file = Path(
             register['status_file']
         )
-        status = self._get_status(app_name=app_name)
+        status = _get_status(app_name=app_name, app_register=self._app_register)
 
         processes_names = [x['init_config']['name'] for x in status['services']]
         services_to_start = [x for x in services if x in processes_names]
@@ -204,17 +155,17 @@ class Configurator:
         )
 
     def restart(self, app_name: str = None, services: tuple = tuple()):
-        register = self._get_app_register(app_name=app_name)
+        register = _get_app_register(app_name=app_name, app_register=self._app_register)
         status_file = Path(
             register['status_file']
         )
         status = SetupStatus(
-            **self._get_status(app_name=app_name)
+            **_get_status(app_name=app_name, app_register=self._app_register)
         )
 
         status.jobs = {
             str(uuid.uuid4()): {
-                'restart': ','.join(services)
+                'restart': {'services': services}
             }
         }
         with status_file.open('w') as new_status_file:
@@ -232,17 +183,19 @@ class Configurator:
         report_file = f'{report_location}/{app_name_}status_report.yaml'.replace('//', '/')
         log.debug(f"cubectl: configurator: creating report: {report_file}")
 
-        register = self._get_app_register(app_name=app_name)
+        # getting status file
+        register = _get_app_register(app_name=app_name, app_register=self._app_register)
         status_file = Path(
             register['status_file']
         )
         status = SetupStatus(
-            **self._get_status(app_name=app_name)
+            **_get_status(app_name=app_name, app_register=self._app_register)
         )
+        # getting status file
 
         status.jobs = {
             str(uuid.uuid4()): {
-                'get_report': report_file
+                'get_report': {'report_file': report_file}
             }
         }
 
@@ -262,3 +215,118 @@ class Configurator:
             if init_time_changed < last_time_changed:
                 return read_yaml(report_file)
         return report
+
+    def get_logs(self, app_name: str, services: tuple, logs_buffer_dir: str, latest: bool = True) -> dict:
+        """
+        Arguments:
+            app_name:
+            services:
+            logs_buffer_dir:
+            latest:
+        """
+
+        logs_buffer_file = f'{logs_buffer_dir}/{app_name}/logs_buffer.yaml'.replace('//', '/')
+        log.debug(f"cubectl: configurator: creating logs buffer: {logs_buffer_file}")
+
+        # getting status file
+        register = _get_app_register(app_name=app_name, app_register=self._app_register)
+        status_file = Path(
+            register['status_file']
+        )
+        status = SetupStatus(
+            **_get_status(app_name=app_name, app_register=self._app_register)
+        )
+        # getting status file
+
+        status.jobs = {
+            str(uuid.uuid4()): {
+                'get_logs': {'services': services, 'latest': latest, 'buffer_file': logs_buffer_file}
+            }
+        }
+
+        logs_buffer_file_path = Path(logs_buffer_file)
+        logs_buffer_file_path.parent.mkdir(parents=True, exist_ok=True)
+        logs_buffer_file_path.touch()
+
+        log.debug(f"cubectl: configurator: updating status file: {status_file}")
+        with status_file.open('w') as new_status_file:
+            yaml.dump(status.dict(), new_status_file)
+
+        init_time_changed = logs_buffer_file_path.stat().st_mtime
+        logs_result = None
+
+        for _ in range(self._config.get('report_number_of_cycles', 5)):
+            sleep(self._config.get('report_retry_wait_time', 1))
+            last_time_changed = logs_buffer_file_path.stat().st_mtime
+            if init_time_changed < last_time_changed:
+                return read_yaml(logs_buffer_file_path)
+        return {"services": "No logs received."}
+
+
+def _get_register(app_register: str) -> list:
+    """Returns whole register."""
+
+    register_path = Path(app_register).resolve()
+    if not register_path.is_file():
+        raise ConfiguratorException('cubectl: No register found.')
+
+    with register_path.open() as f:
+        register: list = yaml.load(f, Loader=yaml.FullLoader)
+        if not register:
+            raise ConfiguratorException('cubectl: Register is empty.')
+
+    return register
+
+
+def _get_app_register(app_name: str, app_register: str) -> dict:
+    """Returns info from register for specific app."""
+
+    register_list = _get_register(app_register=app_register)
+    if not register_list:
+        raise ConfiguratorException(f'cubectl: configurator: no apps found in register')
+
+    for app in register_list:
+        if app['app_name'] == app_name:
+            return app
+    log.debug(f'cubectl: configurator: app: {app_name} not found.')
+    return register_list[0]
+
+
+def _get_status(app_name: str, app_register: str) -> dict:
+    """Returns status object for specific app."""
+
+    register = _get_app_register(app_name=app_name, app_register=app_register)
+    status_file = Path(register['status_file'])
+
+    with status_file.open() as f:
+        result = yaml.load(f, Loader=yaml.FullLoader)
+    return result if result else dict()
+
+
+def _get_all_allocated_ports_by_app(app_register: str) -> dict:
+    """
+    Returns dictionary with following format:
+    {
+        <app_name_0>: [<port>, ..., <port>],
+        <app_name_1>: [<port>, ..., <port>],
+        ...,
+        <app_name_n>: [<port>, ..., <port>],
+    }
+    """
+    register = _get_register(app_register=app_register)
+    ports_by_app = dict()
+
+    for app_name in (x['app_name'] for x in register):
+        try:
+            status = _get_status(app_name=app_name, app_register=app_register)
+        except FileNotFoundError:
+            continue
+        services = status.get('services', [])
+        ports = []
+        for service in services:
+            service_data = service['service_data']
+            if not service_data:
+                continue
+            ports.append(service_data['port'])
+        ports_by_app[app_name] = ports
+    return ports_by_app
