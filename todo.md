@@ -17,7 +17,9 @@
 - [x] `get-apps` command
 - [x] redo register from dict to list
 - [x] fix tests
-- [ ] `restart` wo arguments does not work
+- [x] `restart` wo arguments does not work
+- [ ] fix health checker
+  - [ ] health checker should check only process state.
 
 
 ---
