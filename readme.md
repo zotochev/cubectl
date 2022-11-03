@@ -2,6 +2,7 @@
 Utility for starting and controlling processes in unix environments.
 
 ## Requirements
+* python 3.9 or higher
 * setuptools
 * build (pip install build)
 
@@ -51,6 +52,6 @@ cubectl get-nginx-config [installation_name]
 
 To apply file to nginx directly you can use:
 ```bash
-sudo bash -c "echo \"$(cubectl setup-nginx)\" > /etc/nginx/sites-available/cubectl.conf"
+sudo bash -c "echo \"$(cubectl get-nginx-config)\" > /etc/nginx/sites-available/cubectl.conf"
 sudo ln -s /etc/nginx/sites-available/cubectl.conf /etc/nginx/sites-enabled/cubectl.conf
 ```

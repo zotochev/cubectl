@@ -1,5 +1,5 @@
 jobs:
-  473fe2d4-46b6-4bac-9b54-04caa1c6cd8e:
+  b16e9e24-48c2-48da-9090-42c39a6f662d:
     get_report:
       report_file: /tmp/cubectl/v3_status_report.yaml
 services:
