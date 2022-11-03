@@ -358,9 +358,44 @@ def get_init_file_example():
 
 
 @cli.command('clean')
-@click.argument('app')
-def clean(app):
-    pass
+@click.argument('app_name')
+def clean(app_name: str):
+    _, register = get_app_name_and_register(
+        app_name=None, register_location=register_location
+    )
+    registered_apps = [x['app_name'] for x in register]
+    delete_temp_dir = False
+
+    if app_name in ('all', 'full'):
+        apps_to_delete = register
+        if app_name == 'full':
+            delete_temp_dir = True
+    else:
+        if app_name not in registered_apps:
+            log.warning(
+                f'cubectl: main: clean: app {app_name}, not found in register.'
+            )
+            return
+        apps_to_delete = [x for x in register if x['app_name'] == app_name]
+
+    for app in apps_to_delete:
+        app_dir = app['app_name']
+        for _name, _file in app.items():
+            if _name != 'app_name':
+                Path(_file).unlink(missing_ok=True)
+        try:
+            Path(temp_dir, app_dir).rmdir()
+        except Exception as e:
+            log.error(f'cubectl: main: clean: temp dir for app {app_name} '
+                      f'was not deleted. error: {e}')
+
+    if delete_temp_dir:
+        Path(register_location).unlink(missing_ok=True)
+        try:
+            Path(temp_dir).rmdir()
+        except Exception as e:
+            log.error(f'cubectl: main: clean: temp dir for cubectl '
+                      f'was not deleted. error: {e}')
 
 
 @cli.command('message')

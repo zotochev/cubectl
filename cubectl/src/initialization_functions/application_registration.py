@@ -76,7 +76,10 @@ def register_application(
 
     with register_path.open('w') as f:
         yaml.dump(register, f, Dumper=yaml.Dumper)
-        log.debug(f'cubectl: application_registration: status_file: {status_file}, registered in: {register_path}')
+        log.debug(
+            f'cubectl: application_registration: status_file: {status_file}, '
+            f'registered in: {register_path}'
+        )
     return temp_files
 
 
