@@ -12,7 +12,7 @@ tear_down_commands: []    # not implemented
 # root_dir should be absolut (starts from eg: `/home/admin`)
 root_dir: null
 
-status_file_dir: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp
+#status_file_dir: /home/mikhail/PycharmProjects/cubectl/cubectl/tests/assets/temp
 
 
 # each process follows InitProcessConfig

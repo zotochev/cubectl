@@ -13,11 +13,13 @@ __all__ = [
 class RegisterEntity(BaseModel):
     app_name: str
     status_file: str
+    status_report: Optional[str]
+    log_buffer: Optional[str]
 
 
 class InitFileModel(BaseModel):
-    installation_name: str = 'default_name'
-    status_file_dir: str = '/tmp'
+    installation_name: str
+    # status_file_dir: str = '/tmp'
     set_up_commands: list = []
     tear_down_commands: list = []
     root_dir: Optional[str]

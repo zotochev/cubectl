@@ -9,7 +9,12 @@ import dotenv
 from cubectl.src.configurator import Configurator, ConfiguratorException
 from cubectl.src.executor import Executor, ExecutorException
 
-from cubectl.src import config, register_location
+from cubectl.src import (
+    config,
+    register_location,
+    temp_dir,
+    app_register,
+)
 from cubectl.src.utils import (
     resolve_path,
     get_status_file,
@@ -26,7 +31,7 @@ from cubectl.src.utils import (
 )
 
 
-configurator = Configurator(config)
+configurator = Configurator(config, app_register=register_location)
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__file__)
 dotenv.load_dotenv()
@@ -161,7 +166,7 @@ def status(app_name: str):
         log.debug(f'cubectl: status: getting status for app_name: {app_name}')
         report = configurator.status(
             app_name=app_name,
-            report_location=config['report_location'],
+            # report_location=config['report_location'],
         )
         print(format_report(report=report, app_name=app_name))
     except ConfiguratorException as ce:
@@ -193,7 +198,7 @@ def logs(app_name: str, services: tuple, full: bool):
         report = configurator.get_logs(
             app_name=app_name,
             services=services,
-            logs_buffer_dir=config['log_buffer_location'],
+            # logs_buffer_dir=config['log_buffer_location'],
             latest=(not full),
         )
         if isinstance(report, dict):
@@ -352,17 +357,24 @@ def get_init_file_example():
         log.warning(f'cubectl: main: no init example found in {example_file}.')
 
 
+@cli.command('clean')
+@click.argument('app')
+def clean(app):
+    pass
+
+
 @cli.command('message')
 @click.argument('text', default='default')
 def message(text):
     telegram_token = os.environ['CUBECTL_TELEGRAM_TOKEN']
     telegram_subscribers = os.environ['CUBECTL_TELEGRAM_CHAT_IDS'].split(',')
 
-    send_message_to_subscribers(
-        message=text,
-        telegram_chat_ids=telegram_subscribers,
-        telegram_token=telegram_token,
-    )
+    if telegram_token and telegram_subscribers:
+        send_message_to_subscribers(
+            message=text,
+            telegram_chat_ids=telegram_subscribers,
+            telegram_token=telegram_token,
+        )
 
 
 if __name__ == '__main__':

@@ -26,8 +26,8 @@ log = logging.getLogger(__file__)
 
 def register_application(
         init_config: dict,
-        status_file: str,
-        register_path: str = '/tmp/cubectl_applications_register.yaml',
+        register_path: str,
+        temp_files_dir: str,
         reinit: bool = False,
 ):
     """Writes new application to register.yaml file."""
@@ -35,9 +35,17 @@ def register_application(
     init_config = InitFileModel(**init_config)
     app_name = init_config.installation_name
     register_path = Path(register_path)
+
+    temp_files = {
+        'status_file': f'{temp_files_dir}/{app_name}/status.yaml',
+        'status_report': f'{temp_files_dir}/{app_name}/status_report.yaml',
+        'log_buffer': f'{temp_files_dir}/{app_name}/log_buffer.yaml',
+    }
+    status_file = temp_files['status_file']
+
     entity = RegisterEntity(
         app_name=app_name,
-        status_file=status_file,
+        **temp_files,
     )
 
     register_from_file = None
@@ -52,23 +60,33 @@ def register_application(
     register = register_from_file if register_from_file else list()
     registered_apps = [x['app_name'] for x in register]
 
-    if app_name in registered_apps and reinit:
-        log.debug(f'cubectl: application_registration: application {app_name} '
-                  f'overriden in register')
-        register = [x for x in register if x['app_name'] != app_name]
-    else:
-        message = (f'cubectl: application_registration: application {app_name} '
-                   f'was not overriden in register, because override is False'
-                   )
-        log.error(message)
-        raise ValueError(message)
+    if app_name in registered_apps:
+        if reinit:
+            log.debug(f'cubectl: application_registration: application {app_name} '
+                      f'overriden in register')
+            register = [x for x in register if x['app_name'] != app_name]
+        else:
+            message = (f'cubectl: application_registration: application {app_name} '
+                       f'was not overriden in register, because override is False'
+                       )
+            log.error(message)
+            raise ValueError(message)
 
     register.append(entity.dict())
 
     with register_path.open('w') as f:
         yaml.dump(register, f, Dumper=yaml.Dumper)
         log.debug(f'cubectl: application_registration: status_file: {status_file}, registered in: {register_path}')
+    return temp_files
 
+
+def unregister_application(
+        app_name: str,
+        register_path: str,
+):
+    """Writes new application to register.yaml file."""
+
+    register_path = Path(register_path)
 
 def init_service_status(root_dir, process_init_config: InitProcessConfig):
     """

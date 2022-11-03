@@ -3,9 +3,9 @@
 #
 
 #applications_register: '/tmp/cubectl_applications_register.yaml'
-applications_register: '/tmp/cubectl/cubectl_applications_register.yaml'
+#applications_register: '/tmp/cubectl/cubectl_applications_register.yaml'
 
-default_status_files_dir: '/tmp'
+#default_status_files_dir: '/tmp'
 
 # port from which ports assigning starts
 init_port_number: 9300

@@ -25,11 +25,17 @@ class Configurator:
     Opens status file and sets it in requested state.
     """
 
-    def __init__(self, config: dict = None):
+    def __init__(self, config: dict, app_register: str):
         if not config:
-            config = dict()
+            raise ConfiguratorException('please supply valid config file.')
+
         self._config = config
-        self._app_register = config.get('applications_register', '/tmp/cubectl_application_register.yaml')
+        self._temp_dir = config['temp_dir']
+        # self._app_register = str(Path(self._temp_dir,
+        #                               'cubectl_application_register.yaml'
+        #                               )
+        #                          )
+        self._app_register = app_register
 
     def _assign_ports_to_services(self, status):
         ports_by_app = _get_all_allocated_ports_by_app(app_register=self._app_register)
@@ -68,20 +74,21 @@ class Configurator:
         init_config: InitFileModel = read_yaml(
             init_file, validation_model=InitFileModel
         )
+
         root_dir = init_config.root_dir if init_config.root_dir else Path(init_file).parent
         init_config.root_dir = str(root_dir)
+        # creating app temp directory
+        Path(
+            self._temp_dir, init_config.installation_name
+        ).mkdir(parents=True, exist_ok=True)
 
-        status_file = Path(
-            init_config.status_file_dir,
-            f'{init_config.installation_name}_status_file.yaml'
-        )
-
-        register_application(
+        temp_files = register_application(
             init_config=init_config.dict(),
-            status_file=str(status_file),
             register_path=self._app_register,
+            temp_files_dir=self._temp_dir,
             reinit=reinit,
         )
+        status_file = temp_files['status_file']
 
         status_object = create_status_object(
             init_config=init_config.dict(),
@@ -173,23 +180,18 @@ class Configurator:
         with status_file.open('w') as new_status_file:
             yaml.dump(status.dict(), new_status_file)
 
-    def status(self, app_name: str = None, report_location: str = '/tmp'):
+    def status(self, app_name: str = None):
         """
         Arguments:
             app_name:
-            report_location: location of file with results
 
         """
 
-        app_name_ = app_name + '_' if app_name and app_name else ''
-        report_file = f'{report_location}/{app_name_}status_report.yaml'.replace('//', '/')
-        log.debug(f"cubectl: configurator: creating report: {report_file}")
-
         # getting status file
         register = _get_app_register(app_name=app_name, app_register=self._app_register)
-        status_file = Path(
-            register['status_file']
-        )
+        report_file = register['status_report']
+        log.debug(f"cubectl: configurator: creating report: {report_file}")
+        status_file = Path(register['status_file'])
         status = SetupStatus(
             **_get_status(app_name=app_name, app_register=self._app_register)
         )
@@ -218,20 +220,19 @@ class Configurator:
                 return read_yaml(report_file)
         return report
 
-    def get_logs(self, app_name: str, services: tuple, logs_buffer_dir: str, latest: bool = True) -> dict:
+    def get_logs(self, app_name: str, services: tuple, latest: bool = True) -> dict:
         """
         Arguments:
             app_name:
             services:
-            logs_buffer_dir:
             latest:
         """
 
-        logs_buffer_file = f'{logs_buffer_dir}/{app_name}/logs_buffer.yaml'.replace('//', '/')
+        register = _get_app_register(app_name=app_name, app_register=self._app_register)
+        logs_buffer_file = register['log_buffer']
         log.debug(f"cubectl: configurator: creating logs buffer: {logs_buffer_file}")
 
         # getting status file
-        register = _get_app_register(app_name=app_name, app_register=self._app_register)
         status_file = Path(
             register['status_file']
         )
