@@ -275,7 +275,8 @@ class ServiceProcess:
         """
         'system_data': {'error_code': None, 'pid': 363868, 'state': 'STARTED'}
         """
-        return desired_status.state is self.state
+        self._state = self._get_real_state()
+        return desired_status.state is self._state
 
     def _make_to_follow_state(self, state: ProcessState):
         factory = {
@@ -313,21 +314,21 @@ class ServiceProcess:
             # usually no need to restart
             self._make_to_follow_system_data(desired_status.system_data)
 
-    def check_status(self, desired_status: ProcessStatus):
-        """Check following of status file."""
-
-        # if not _compare_status_init_config(
-        #         current_status=self._init_config,
-        #         desired_status=desired_status.init_config
-        # ):
-        #     pass
-        #
-        # if self.is_service() and not self._compare_status_service_data(desired_status.service_data):
-        #     pass
-
-        if not self._compare_status_system_data(desired_status.system_data):
-            return False
-        return True
+    # def check_status(self, desired_status: ProcessStatus):
+    #     """Check following of status file."""
+    #
+    #     # if not _compare_status_init_config(
+    #     #         current_status=self._init_config,
+    #     #         desired_status=desired_status.init_config
+    #     # ):
+    #     #     pass
+    #     #
+    #     # if self.is_service() and not self._compare_status_service_data(desired_status.service_data):
+    #     #     pass
+    #
+    #     if not self._compare_status_system_data(desired_status.system_data):
+    #         return False
+    #     return True
 
     def is_failed_to_start(self):
         return self.state is ProcessState.failed_to_start

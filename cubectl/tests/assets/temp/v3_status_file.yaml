@@ -1,7 +1,4 @@
-jobs:
-  b16e9e24-48c2-48da-9090-42c39a6f662d:
-    get_report:
-      report_file: /tmp/cubectl/v3_status_report.yaml
+jobs: {}
 services:
 - init_config:
     arguments:
