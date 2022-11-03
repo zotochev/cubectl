@@ -1,4 +1,7 @@
-jobs: {}
+jobs:
+  473fe2d4-46b6-4bac-9b54-04caa1c6cd8e:
+    get_report:
+      report_file: /tmp/cubectl/v3_status_report.yaml
 services:
 - init_config:
     arguments:
@@ -9,6 +12,7 @@ services:
     environment: {}
     executor: /home/mikhail/Documents/work/labs/.venv/bin/python
     file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    log: null
     name: tenants
     port: 9100
     service: true
@@ -29,6 +33,7 @@ services:
     environment: {}
     executor: /home/mikhail/Documents/work/labs/.venv/bin/python
     file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    log: null
     name: documents
     port: 9101
     service: true
@@ -49,6 +54,7 @@ services:
     environment: {}
     executor: /home/mikhail/Documents/work/labs/.venv/bin/python
     file: /home/mikhail/Documents/work/labs/src/monolith_service_args.py
+    log: null
     name: flows
     port: 9102
     service: true
@@ -72,6 +78,7 @@ services:
       TELEGRAM_TOKEN: 5305034368:AAGnUkZKTlo5mx2DXHrcEercrL9q6SpH3GU
     executor: /home/mikhail/Documents/work/labs/.venv/bin/python
     file: /home/mikhail/Documents/work/labs/src/workers/telegram.py
+    log: null
     name: telegram_worker
     port: null
     service: false
@@ -89,6 +96,7 @@ services:
       PYTHONPATH: /home/mikhail/Documents/work/labs/src
     executor: /home/mikhail/Documents/work/labs/.venv/bin/python
     file: /home/mikhail/Documents/work/labs/src/workers/dummy_worker.py
+    log: null
     name: dummy_worker
     port: null
     service: false

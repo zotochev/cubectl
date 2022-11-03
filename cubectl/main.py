@@ -4,6 +4,7 @@ import click
 from pathlib import Path
 import logging
 from pprint import pprint
+import dotenv
 
 from cubectl.src.configurator import Configurator, ConfiguratorException
 from cubectl.src.executor import Executor, ExecutorException
@@ -28,6 +29,7 @@ from cubectl.src.utils import (
 configurator = Configurator(config)
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__file__)
+dotenv.load_dotenv()
 
 
 @click.group()
@@ -46,7 +48,8 @@ def cli():
 
 @cli.command('init')
 @click.argument('init_file')
-def init(init_file: str):
+@click.option('--override', default=False, is_flag=True)
+def init(init_file: str, override: bool):
     """
     Registers application in cubectl_application_register.yaml
     Creates status file out of init_file.
@@ -54,14 +57,15 @@ def init(init_file: str):
     This command does not start services. To start service use 'start' command.
 
     Arguments:
-        init_file:  init file path
+        init_file:  init file path.
+        override: flag to override app in register if exists.
     """
 
     init_file = resolve_path(
         root_dir=None, file_path=init_file, return_dir=False
     )
     try:
-        configurator.init(init_file=init_file, reinit=True)
+        configurator.init(init_file=init_file, reinit=override)
     except ConfiguratorException as ce:
         print(f"Initialization failed: {ce}")
 
@@ -223,6 +227,9 @@ def watch(app_name, check):
     if telegram_token:
         m = TelegramMessanger(token=telegram_token)
         m.add_subscribers(ids=telegram_subscribers)
+        log.debug('cubectl: main: watch: telegram messanger successfully configured.')
+    else:
+        log.warning('cubectl: main: watch: telegram messanger was not configured.')
 
     try:
         status_file = get_status_file(

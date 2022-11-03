@@ -17,9 +17,11 @@
 - [x] `get-apps` command
 - [x] redo register from dict to list
 - [x] fix tests
-- [x] `restart` wo arguments does not work
-- [ ] fix health checker
-  - [ ] health checker should check only process state.
+- [ ] clean up classes:
+  - [ ] move out of classes functions that can be static
+    - [ ] Executor
+    - [x] Configurator
+    - [ ] ServiceProcess
 
 
 ---
@@ -36,6 +38,7 @@ Class for launching, monitoring and controlling one process.
 
 Class for configuring applications `register`, creating and changing `status files`
 
+- [x] Created class.
 - [x] Design `status_file`.
   - [x] Services state.
   - [x] Jobs to execute.
@@ -45,17 +48,21 @@ Class for configuring applications `register`, creating and changing `status fil
   - [ ] Decide how port stored in to status file should be propagated to process itself:
     - [ ] Via env variable.
     - [ ] Via argument (--port 9006).
-- [ ] get `log`
+- [x] `get-logs` command
+  - [x] return logs from supplied log file
   - [ ] try to read stdout or stderr from popen object
 
 ---
 ## Executor
 Class that keeps `ServiceProcess` instances, reads `status file` and impacts on processes accordingly to `status file` (starts, stops, retrieves current status).
 
+- [x] Created class.
 - [x] Read `status file` and apply status to processes.
 - [ ] Processes health check.
+  - [ ] save desired state and compare to it
   - [x] Restart process if failed.
-  - [ ] Stop restarting process after some number of attempts.
-    - [ ] create algorithm using max_attempts, current_attempt, count_attempt
+  - [x] Stop restarting process after some number of attempts.
+    - [x] create algorithm using max_attempts, current_attempt, count_attempt
   - [x] Send message to telegram in some cases.
 - [x] Saving report for `status` command.
+- [x] `restart` wo arguments does not work

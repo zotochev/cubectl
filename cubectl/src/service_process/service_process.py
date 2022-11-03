@@ -51,32 +51,39 @@ class ServiceProcess:
         self._number_of_start_retries = number_of_start_retries
         self._number_of_start_retries_left = number_of_start_retries
         self._log_reader: LogReaderProtocol = LogReader(self._init_config.log)
+        self._informed_about_fail = False
+        self._last_status: Optional[ProcessStatus] = None
 
     def start(self):
-        self._check_process()
-        if self._state is ProcessState.started:
+        real_state = self._get_real_state()
+
+        if real_state is ProcessState.started:
             return
-        if self._state is ProcessState.failed_to_start:
-            log.warning(
-                f'cubectl: ServiceProcess: {self.name} is in {self._state} state. '
-                f'Try to restart before process'
-            )
+
+        if real_state is ProcessState.failed_to_start:
+            if not self.is_informed_about_fail():
+                log.warning(
+                    f'cubectl: ServiceProcess: {self.name} is in {self._state} state. '
+                    f'Try to restart process'
+                )
             return
+
+        if real_state is ProcessState.failed_start_loop:
+            try:
+                self._decrement_retries()
+            except ServiceProcessNoRetriesException:
+                pass
 
         self._process = Popen(
             self._start_up_command,
             env=self._resolve_env()
         )
 
-        self._check_process()
-        if self._state is not ProcessState.started:
-            self._state = ProcessState.failed_start_loop
-            try:
-                self._decrement_retries()
-            except ServiceProcessNoRetriesException:
-                self._state = ProcessState.failed_to_start
-        else:
+        real_state = self._get_real_state()
+        if real_state is ProcessState.started:
             self._process_started_at = datetime.now()
+
+        self._state = real_state
 
     def status(self) -> ProcessStatus:
         """
@@ -113,7 +120,7 @@ class ServiceProcess:
         self._number_of_start_retries_left = self._number_of_start_retries
 
     def _decrement_retries(self):
-        if self._number_of_start_retries_left == 0:
+        if self._number_of_start_retries_left <= 0:
             raise ServiceProcessNoRetriesException(
                 'cubectl: ServiceProces: no start up retries left.'
             )
@@ -125,12 +132,13 @@ class ServiceProcess:
         state: ProcessState
         error_code: Optional[int]
         """
-        _ = self
-        error_code = self._check_process()
+        # error_code = self._check_process()
+        error_code = self._get_error_code()
+        real_state = self._get_real_state()
 
         return SystemData(
             pid=self.pid,
-            state=self._state,
+            state=real_state,
             error_code=error_code,
             started_at=str(self._process_started_at),
         )
@@ -147,36 +155,51 @@ class ServiceProcess:
             nginx_config='',
         )
 
-    def _check_process(self):
-        error_code = -555
+    def _get_error_code(self):
+        if self._process:
+            return self._process.poll()
+
+    def _get_real_state(self):
         sleep(OS_OPERATIONS_DELAY)
 
-        if self._process is not None:
-            error_code = self._process.poll()
+        if self._process is None:
+            return ProcessState.stopped
 
-        if error_code is not None:
-            self._process_stopped_at = datetime.now()
+        error_code = self._process.poll()
 
-            self._process_started_at = None
-            if (self._state is not ProcessState.failed_start_loop
-                    and self._state is not ProcessState.failed_to_start):
-                self._state = ProcessState.stopped
-            elif self.state is ProcessState.failed_start_loop and self._number_of_start_retries_left == 0:
-                self._state = ProcessState.failed_to_start
-        else:
-            self._state = ProcessState.started
-        return error_code
+        if error_code is None:
+            return ProcessState.started
+
+        if self._last_status is None:
+            log.warning('cubectl: service_process: get_real_state: unexpected last_status is None')
+            return ProcessState.stopped
+
+        if self._last_status.system_data.state is ProcessState.started:
+            if self._number_of_start_retries_left <= 0:
+                return ProcessState.failed_to_start
+            return ProcessState.failed_start_loop
+
+        if self._last_status.system_data.state is ProcessState.stopped:
+            return ProcessState.stopped
+
+        return ProcessState.stopped
 
     def stop(self):
         self._reset_process_start_retries()
+        real_state = self._get_real_state()
 
-        if self.state is not ProcessState.stopped:
+        if real_state is not ProcessState.stopped:
             if self._process is not None:
                 self._process.kill()
-        if (self.state is ProcessState.failed_start_loop
-                or self.state is ProcessState.failed_to_start):
+                self._process_started_at = None
+                self._process_stopped_at = datetime.now()
+
+        real_state = self._get_real_state()
+
+        if (real_state is ProcessState.failed_start_loop
+                or real_state is ProcessState.failed_to_start):
             self._state = ProcessState.stopped
-        self._check_process()
+        self._state = self._get_real_state()
 
     def restart(self):
         self.stop()
@@ -243,7 +266,6 @@ class ServiceProcess:
         """
         'service_data': {'nginx_config': '', 'port': 123456789},
         """
-        _ = self
         return self._port == desired_status.port
 
     def _make_follow_service_data(self, desired_status: ServiceData):
@@ -269,7 +291,9 @@ class ServiceProcess:
         self._make_to_follow_state(desired_status.state)
 
     def apply_status(self, desired_status: ProcessStatus):
+        desired_status.system_data.state = ProcessState(desired_status.system_data.state)
         to_restart = False
+        self._last_status = desired_status
 
         if not _compare_status_init_config(
             current_status=self._init_config,
@@ -288,6 +312,34 @@ class ServiceProcess:
         if not self._compare_status_system_data(desired_status.system_data):
             # usually no need to restart
             self._make_to_follow_system_data(desired_status.system_data)
+
+    def check_status(self, desired_status: ProcessStatus):
+        """Check following of status file."""
+
+        # if not _compare_status_init_config(
+        #         current_status=self._init_config,
+        #         desired_status=desired_status.init_config
+        # ):
+        #     pass
+        #
+        # if self.is_service() and not self._compare_status_service_data(desired_status.service_data):
+        #     pass
+
+        if not self._compare_status_system_data(desired_status.system_data):
+            return False
+        return True
+
+    def is_failed_to_start(self):
+        return self.state is ProcessState.failed_to_start
+
+    def informed_about_fail_tick(self):
+        self._informed_about_fail = True
+
+    def informed_about_fail_reset(self):
+        self._informed_about_fail = False
+
+    def is_informed_about_fail(self):
+        return self._informed_about_fail
 
     def get_logs(self, latest: bool = True):
         try:

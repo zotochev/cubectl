@@ -27,7 +27,8 @@ log = logging.getLogger(__file__)
 def register_application(
         init_config: dict,
         status_file: str,
-        register_path: str = '/tmp/cubectl_applications_register.yaml'
+        register_path: str = '/tmp/cubectl_applications_register.yaml',
+        reinit: bool = False,
 ):
     """Writes new application to register.yaml file."""
 
@@ -51,9 +52,16 @@ def register_application(
     register = register_from_file if register_from_file else list()
     registered_apps = [x['app_name'] for x in register]
 
-    if app_name in registered_apps:
-        log.warning(f'cubectl: application_registration: application {app_name} overriden in register')
+    if app_name in registered_apps and reinit:
+        log.debug(f'cubectl: application_registration: application {app_name} '
+                  f'overriden in register')
         register = [x for x in register if x['app_name'] != app_name]
+    else:
+        message = (f'cubectl: application_registration: application {app_name} '
+                   f'was not overriden in register, because override is False'
+                   )
+        log.error(message)
+        raise ValueError(message)
 
     register.append(entity.dict())
 

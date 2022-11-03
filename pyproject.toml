@@ -14,4 +14,4 @@ dependencies = {file = ["requirements.txt"]}
 where = ["."]
 
 [tool.setuptools.package-data]
-cubectl = ["config.yaml", "init-file-example.yaml"]
+cubectl = ["config.yaml", "init-file-example.yaml", ".env"]

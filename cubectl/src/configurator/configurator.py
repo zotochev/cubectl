@@ -80,6 +80,7 @@ class Configurator:
             init_config=init_config.dict(),
             status_file=str(status_file),
             register_path=self._app_register,
+            reinit=reinit,
         )
 
         status_object = create_status_object(
@@ -92,8 +93,9 @@ class Configurator:
             status_file = Path(status_file, '')
 
         if Path(status_file).is_file() and not reinit:
-            log.warning('cubectl: main: init: status file was not overriden because reinit=False.')
-            return
+            log.warning('cubectl: main: init: status file was not overriden '
+                        'because reinit=False.')
+            raise ValueError('Status file already exists.')
 
         with open(status_file, 'w') as f:
             yaml.dump(status_object.dict(), f)

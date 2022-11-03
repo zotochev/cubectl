@@ -40,6 +40,7 @@ class Executor:
         self._messanger: Optional[Messanger] = None
         self._meta_info = meta_info
         self._last_job = None
+        self._last_status = None
 
     @staticmethod
     def _validate_status_file(status_file: Path):
@@ -96,7 +97,13 @@ class Executor:
     def _stop_all_processes(self):
         for process in self._processes:
             process: ServiceProcess
-            process.stop()
+            try:
+                process.stop()
+            except Exception as e:
+                log.error(
+                    f'cubectl: executor: stopping of process {process.name} '
+                    f'failed. {self._meta_info=} with error: {e}'
+                )
 
     def _do_jobs(self, jobs: dict):
         factory = {
@@ -109,8 +116,13 @@ class Executor:
             if method in jobs:
                 factory[method](**jobs[method])
 
-    def _update_processes(self):
-        status = self._get_status()
+    def _update_processes(self, status_object: dict):
+        if status_object is None:
+            log.warning(
+                'cubectl: executor: not status object was found to update processes.'
+            )
+            return
+        status = status_object
 
         jobs: dict = status.get('jobs', {})
         if jobs:
@@ -132,10 +144,15 @@ class Executor:
             process_status = ProcessStatus(**process_status)
             process.apply_status(process_status)
 
+            if process.is_failed_to_start():
+                if not process.is_informed_about_fail():
+                    self._message_process_status(process=process)
+                process.informed_about_fail_tick()
+            else:
+                process.informed_about_fail_reset()
+
     def _health_check(self):
-        for process in self._processes:
-            if process.is_fail_restart_loop():
-                self._message_process_status(process=process)
+        self._update_processes(status_object=self._last_status)
 
     def _get_status(self):
         with self._status_file.open() as f:
@@ -156,15 +173,18 @@ class Executor:
 
         try:
             while True:
-                if self._is_status_file_changed() or first_cycle or True:
+                if self._is_status_file_changed() or first_cycle:
                     first_cycle = False
-                    self._update_processes()
+                    self._last_status = self._get_status()
 
-                self._health_check()
+                self._update_processes(status_object=self._last_status)
 
                 sleep(cycle_period)
-        except (Exception, KeyboardInterrupt):
+        except KeyboardInterrupt:
             self._stop_all_processes()
+        except Exception as e:
+            self._stop_all_processes()
+            log.critical(f'cubectl: executor: process loop failed: error: {e}')
 
     def add_messanger(self, messanger: Messanger):
         self._messanger = messanger
