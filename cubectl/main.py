@@ -360,9 +360,13 @@ def get_init_file_example():
 @cli.command('clean')
 @click.argument('app_name')
 def clean(app_name: str):
-    _, register = get_app_name_and_register(
-        app_name=None, register_location=register_location
-    )
+    try:
+        _, register = get_app_name_and_register(
+            app_name=None, register_location=register_location
+        )
+    except FileNotFoundError as fnf:
+        print(fnf)
+        return
     registered_apps = [x['app_name'] for x in register]
     delete_temp_dir = False
 
