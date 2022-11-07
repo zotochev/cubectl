@@ -1,6 +1,7 @@
 import os
 import sys
 import signal
+import time
 
 import click
 from pathlib import Path
@@ -225,6 +226,9 @@ def handler_stop(signum, frame):
         log.info(f'cubectl: main: handling signal: stopping {app}.')
         stop_func(app, tuple())
 
+    wtime = os.getenv('CUBECTL_WATCHER_CHECK_PERIOD', 2)
+    time.sleep(int(wtime) + 1)
+
     sys.exit(0)
 
 
@@ -247,6 +251,7 @@ def watch(app_name, check):
     app_name, _ = get_app_name_and_register(
         app_name=app_name, register_location=register_location
     )
+    os.environ['CUBECTL_WATCHER_CHECK_PERIOD'] = check
 
     status_file = None
     telegram_token = os.getenv('CUBECTL_TELEGRAM_TOKEN')
