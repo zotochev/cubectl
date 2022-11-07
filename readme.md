@@ -3,12 +3,26 @@ Utility for starting and controlling processes in unix environments.
 
 ## Requirements
 * python 3.9 or higher
-* setuptools
+* pip
 * build (pip install build)
+* setuptools
 
 ## Installation of cubectl
+[OPTIONAL] Update and install requirements if you need:
 ```bash
-python -m build && pip3 install .
+sudo apt install python3-pip
+python -m pip install --upgrade pip
+pip install setuptools --upgrade
+python -m pip install build
+```
+[OPTIONAL] After installation of pip check that pip location added to PATH env variable:
+```bash
+echo ${PATH} | grep "/home/${USER}/.local/bin" > /dev/null && echo "OK: PIP is set up" || echo "ERROR: Default pip location not found in PATH"
+```
+
+Build and install package
+```bash
+python -m build && pip install .
 ```
 For specific version of python
 ```bash

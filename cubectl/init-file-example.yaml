@@ -27,7 +27,7 @@ processes:
     environment:        # object of env variables
       FOO: 'BAR'
       ONE: 'ONE1'
-    env-files: []       # list of env files
+    env_files: []       # list of env files
     dotenv: false       # if true (default true) tries to load .env file near command file
 
     service: true       # if true (default false) assigns port and nginx config

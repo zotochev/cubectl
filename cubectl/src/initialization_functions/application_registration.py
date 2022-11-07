@@ -124,6 +124,7 @@ def init_service_status(root_dir, process_init_config: InitProcessConfig):
         log.error(_message)
         raise FileNotFoundError(_message)
     process_init_config.file = file
+
     env_files = process_init_config.env_files
     process_init_config.env_files = [
         resolve_path(root_dir=root_dir, file_path=x, return_dir=False)

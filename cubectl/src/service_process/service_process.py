@@ -359,8 +359,15 @@ class ServiceProcess:
 
 
 def _create_start_up_command(executor: str, file: str, args: dict):
-    args = ' '.join([f'{k} {v}' for k, v in args.items()])
-    return [x for x in f'{executor} {file} {args}'.split() if x]
+    def is_arg(_arg: str):
+        if isinstance(_arg, str):
+            return not _arg.startswith(('&', '|', '>', '<'))
+        return _arg
+
+    # args_resolved = ' '.join([f'{k} {v}' for k, v in args.items() if is_arg(k) and is_arg(v)])
+    # args_other = ' '.join([f'{k} {v}' for k, v in args.items() if not is_arg(k) or not is_arg(v)])
+    args_ = ' '.join([f'{k} {v}' for k, v in args.items()])
+    return [x for x in f'{executor} {file} {args_}'.split() if x]
 
 
 def _compare_status_init_config(current_status: InitProcessConfig, desired_status: InitProcessConfig) -> bool:

@@ -1,4 +1,5 @@
 import os
+import signal
 
 import click
 from pathlib import Path
@@ -209,6 +210,28 @@ def logs(app_name: str, services: tuple, full: bool):
         print(f"Failed to get status for {app_name}: {ce}")
 
 
+def handler_stop(signum, frame):
+    stop_func = stop.callback
+    try:
+        app_name, register = get_app_name_and_register(
+            app_name=None, register_location=register_location
+        )
+        apps = [f'* {x["app_name"]}' for x in register]
+    except FileNotFoundError:
+        apps = []
+
+    for app in apps:
+        log.info(f'cubectl: main: handling signal: stopping {app}.')
+        stop_func(app, tuple())
+
+    os.exit(0)
+
+
+signal.signal(signal.SIGINT, handler_stop)
+signal.signal(signal.SIGABRT, handler_stop)
+signal.signal(signal.SIGTERM, handler_stop)
+
+
 @cli.command('watch')
 @click.argument('app_name', default='default')
 @click.option('--check', '-c', default=1, help='Period of checking processes status')
@@ -417,4 +440,5 @@ def message(text):
 
 
 if __name__ == '__main__':
+    print()
     cli()

@@ -6,20 +6,20 @@
 - [x] Change state of processes using configurator.
 - [x] Decide who will choose ports for services -> Configurator class.
 
-- [ ] Add `init` command.
-  - [ ] check temp_dir existence
+- [x] Add `init` command.
+  - [x] check temp_dir existence
 - [x] Add `start` command.
 - [x] Add `nginx` config creation.
 
-- [ ] `clean` command
+- [x] `clean` command
   - `clean <app_name>`
-    - [ ] deletes status file
-    - [ ] delete report file
-    - [ ] delete log buffer file
-    - [ ] deletes app from register
+    - [x] deletes status file
+    - [x] delete report file
+    - [x] delete log buffer file
+    - [x] deletes app from register
   - `clean all`
-    - [ ] calls `clean` command for all apps
-    - [ ] deletes `register`
+    - [x] calls `clean` command for all apps
+    - [x] deletes `register`
 
 - [x] `get-apps` command
 - [x] redo register from dict to list
@@ -72,6 +72,6 @@ Class that keeps `ServiceProcess` instances, reads `status file` and impacts on 
     - [x] create algorithm using max_attempts, current_attempt, count_attempt
   - [x] Send message to telegram in some cases.
   - [ ] In case of error send logs (short version if possible) to telegram.
-    - [ ] truncate in case to long.
+    - [ ] truncate in case too long.
 - [x] Saving report for `status` command.
 - [x] `restart` wo arguments does not work
