@@ -403,7 +403,7 @@ def kill(app_name: str):
 
     try:
         for app in register:
-            if app[app_name] == app_name:
+            if app['app_name'] == app_name:
                 watcher_pid = int(app['watcher_pid'])
                 os.kill(watcher_pid, signal.SIGTERM)
                 log.debug(f'cubectl: kill: app_name: {app_name}')
