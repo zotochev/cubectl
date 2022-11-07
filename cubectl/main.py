@@ -397,14 +397,19 @@ def kill(app_name: str):
     Arguments:
         app_name: [Optional] Application name
     """
-    app_name, register = get_app_name_and_register(
+    _, register = get_app_name_and_register(
         app_name=app_name, register_location=register_location
     )
 
     try:
-        watcher_pid = int(register[app_name]['watcher_pid'])
-        os.kill(watcher_pid, signal.SIGTERM)
-        log.debug(f'cubectl: kill: app_name: {app_name}')
+        for app in register:
+            if app[app_name] == app_name:
+                watcher_pid = int(app['watcher_pid'])
+                os.kill(watcher_pid, signal.SIGTERM)
+                log.debug(f'cubectl: kill: app_name: {app_name}')
+                return
+
+        log.error(f'cubectl: kill: app_name: {app_name} not found.')
     except Exception as e:
         log.error(f'cubectl: kill: app_name: {app_name} failed: {e}.')
 
