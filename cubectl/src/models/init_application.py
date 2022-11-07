@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from pydantic import BaseModel, validator
 
 from cubectl.src.models.init_process import InitProcessConfig
@@ -15,6 +15,7 @@ class RegisterEntity(BaseModel):
     status_file: str
     status_report: Optional[str]
     log_buffer: Optional[str]
+    watcher_pid: Optional[Union[str, int]]
 
 
 class InitFileModel(BaseModel):

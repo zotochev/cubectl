@@ -8,6 +8,7 @@ from pathlib import Path
 import logging
 from pprint import pprint
 import dotenv
+import yaml
 
 from cubectl.src.configurator import Configurator, ConfiguratorException
 from cubectl.src.executor import Executor, ExecutorException
@@ -248,7 +249,7 @@ def watch(app_name, check):
         app_name:
         check: Period of checking processes status.
     """
-    app_name, _ = get_app_name_and_register(
+    app_name, register = get_app_name_and_register(
         app_name=app_name, register_location=register_location
     )
     os.environ['CUBECTL_WATCHER_CHECK_PERIOD'] = str(check)
@@ -270,7 +271,20 @@ def watch(app_name, check):
             app_name=app_name, register_location=register_location
         )
     except Exception as e:
-        print(f'Failed to retrieve status file for {app_name}. Error: {e}')
+        log.error(f'Failed to retrieve status file for {app_name}. Error: {e}')
+
+    try:
+        app_index = -1
+        for i in range(len(register)):
+            if register[i]['app_name'] == app_name:
+                app_index = i
+                register[i]['watcher_pid'] = os.getpid()
+                break
+        if app_index != -1:
+            with Path(register_location).open('w') as f:
+                yaml.dump(register, f)
+    except Exception as e:
+        log.error(f'cubectl: main: watch: updating of register with watcher pid failed: {e}')
 
     try:
         log.debug(f'cubectl: main: creating Executor for app: {app_name}, with arguments: {status_file=}; {app_name=}')
@@ -278,7 +292,7 @@ def watch(app_name, check):
         e.add_messanger(m)
         e.process(cycle_period=check)
     except ExecutorException as ee:
-        print(f'Failed to start {app_name}. Error: {ee}')
+        log.error(f'Failed to start {app_name}. Error: {ee}')
 
 
 @cli.command('get-nginx-config')
@@ -374,6 +388,25 @@ def get_apps():
         print(*apps, sep='\n')
     else:
         print('Applications not found.')
+
+
+@cli.command('kill')
+@click.argument('app_name')
+def kill(app_name: str):
+    """
+    Arguments:
+        app_name: [Optional] Application name
+    """
+    app_name, register = get_app_name_and_register(
+        app_name=app_name, register_location=register_location
+    )
+
+    try:
+        watcher_pid = int(register[app_name]['watcher_pid'])
+        os.kill(watcher_pid, signal.SIGTERM)
+        log.debug(f'cubectl: kill: app_name: {app_name}')
+    except Exception as e:
+        log.error(f'cubectl: kill: app_name: {app_name} failed: {e}.')
 
 
 @cli.command('get-init-file-example')
