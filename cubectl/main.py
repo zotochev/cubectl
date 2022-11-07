@@ -1,4 +1,5 @@
 import os
+import sys
 import signal
 
 import click
@@ -224,7 +225,7 @@ def handler_stop(signum, frame):
         log.info(f'cubectl: main: handling signal: stopping {app}.')
         stop_func(app, tuple())
 
-    os.exit(0)
+    sys.exit(0)
 
 
 signal.signal(signal.SIGINT, handler_stop)
