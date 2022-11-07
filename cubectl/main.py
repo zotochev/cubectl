@@ -251,7 +251,7 @@ def watch(app_name, check):
     app_name, _ = get_app_name_and_register(
         app_name=app_name, register_location=register_location
     )
-    os.environ['CUBECTL_WATCHER_CHECK_PERIOD'] = check
+    os.environ['CUBECTL_WATCHER_CHECK_PERIOD'] = str(check)
 
     status_file = None
     telegram_token = os.getenv('CUBECTL_TELEGRAM_TOKEN')
