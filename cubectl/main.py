@@ -394,9 +394,12 @@ def get_apps():
 @click.argument('app_name')
 def kill(app_name: str):
     """
+    command to kill app watcher.
+
     Arguments:
         app_name: [Optional] Application name
     """
+
     _, register = get_app_name_and_register(
         app_name=app_name, register_location=register_location
     )
