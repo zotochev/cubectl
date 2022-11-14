@@ -22,7 +22,7 @@ echo ${PATH} | grep "/home/${USER}/.local/bin" > /dev/null && echo "OK: PIP is s
 
 Build and install package
 ```bash
-python -m build && pip install .
+python -m build && python -m pip install .
 ```
 For specific version of python
 ```bash
