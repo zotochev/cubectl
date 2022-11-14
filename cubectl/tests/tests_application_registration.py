@@ -27,8 +27,10 @@ class TestInitializationBasic(unittest.TestCase):
 
         register_application(
             init_config=self.init_config,
-            status_file=self.status_file_location,
+            # status_file=self.status_file_location,
             register_path=self.register_location,
+            temp_files_dir='assets/utils_tests/',
+            reinit=True,
         )
 
 

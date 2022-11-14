@@ -58,7 +58,7 @@ class ServiceProcess:
         real_state = self._get_real_state()
 
         if real_state is ProcessState.started:
-            return
+            return real_state
 
         if real_state is ProcessState.failed_to_start:
             if not self.is_informed_about_fail():
@@ -66,7 +66,7 @@ class ServiceProcess:
                     f'cubectl: ServiceProcess: {self.name} is in {self._state} state. '
                     f'Try to restart process'
                 )
-            return
+            return real_state
 
         if real_state is ProcessState.failed_start_loop:
             try:
@@ -74,10 +74,15 @@ class ServiceProcess:
             except ServiceProcessNoRetriesException:
                 pass
 
-        self._process = Popen(
-            self._start_up_command,
-            env=self._resolve_env()
-        )
+        try:
+            self._process = Popen(
+                self._start_up_command,
+                env=self._resolve_env()
+            )
+        except FileNotFoundError as f:
+            log.error(f'cubectl: service_process: {f}')
+        except Exception as e:
+            log.error(f'cubectl: service_process: {e}')
 
         real_state = self._get_real_state()
         if real_state is ProcessState.started:

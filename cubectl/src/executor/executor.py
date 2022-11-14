@@ -114,6 +114,7 @@ class Executor:
 
         for method in factory:
             if method in jobs:
+                log.debug(f'cubectl: executor: executing job: {method}({jobs[method]})')
                 factory[method](**jobs[method])
 
     def _update_processes(self, status_object: dict):

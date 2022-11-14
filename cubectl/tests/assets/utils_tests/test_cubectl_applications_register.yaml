@@ -1,2 +1,5 @@
 - app_name: enegan
-  status_file: assets/utils_tests/status_file.yaml
+  log_buffer: assets/utils_tests//enegan/log_buffer.yaml
+  status_file: assets/utils_tests//enegan/status.yaml
+  status_report: assets/utils_tests//enegan/status_report.yaml
+  watcher_pid: null

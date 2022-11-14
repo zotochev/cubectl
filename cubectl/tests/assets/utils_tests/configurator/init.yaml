@@ -26,7 +26,7 @@ processes:
   - name: service_0
 
     executor: 'python'
-    file: 'assets/example_services/example_service_0.py'
+    file: 'example_services/example_service_0.py'
     arguments:
       '--name': 'name_0'
 
@@ -42,7 +42,7 @@ processes:
   - name: service_1
 
     executor: 'python'
-    file: 'assets/example_services/example_service_0.py'
+    file: 'example_services/example_service_0.py'
     arguments:
       '--name': 'name_1'
 

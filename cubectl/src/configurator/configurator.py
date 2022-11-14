@@ -204,21 +204,25 @@ class Configurator:
         }
 
         report_file_path = Path(report_file)
+        report_file_path.unlink(missing_ok=True)
         report_file_path.touch()
+        init_time_changed = report_file_path.stat().st_mtime
 
         log.debug(f"cubectl: configurator: updating status file: {status_file}")
         with status_file.open('w') as new_status_file:
             yaml.dump(status.dict(), new_status_file)
 
-        init_time_changed = report_file_path.stat().st_mtime
         report = None
 
         for _ in range(self._config.get('report_number_of_cycles', 5)):
             sleep(self._config.get('report_retry_wait_time', 1))
             last_time_changed = report_file_path.stat().st_mtime
             if init_time_changed < last_time_changed:
-                return read_yaml(report_file)
-        return report
+                report = read_yaml(report_file)
+                break
+
+        report_file_path.unlink(missing_ok=True)
+        return report if report else None
 
     def get_logs(self, app_name: str, services: tuple, latest: bool = True) -> dict:
         """

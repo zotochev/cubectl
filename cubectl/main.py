@@ -228,7 +228,8 @@ def handler_stop(signum, frame):
         log.info(f'cubectl: main: handling signal: stopping {app}.')
         stop_func(app, tuple())
 
-    executor._stop_all_processes()
+    if executor is not None:
+        executor._stop_all_processes()
 
     sys.exit(0)
 

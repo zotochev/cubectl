@@ -5,6 +5,8 @@ default_status_files_dir: '/tmp'
 # port from which ports assigning starts
 init_port_number: 9300
 
+temp_dir: 'assets/temp'
+
 # status command from Configurator
 # waiting retry period (one cycle)
 report_retry_wait_time: 1
