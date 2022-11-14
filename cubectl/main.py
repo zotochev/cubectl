@@ -263,9 +263,15 @@ def watch(app_name, check):
     if telegram_token:
         m = TelegramMessanger(token=telegram_token)
         m.add_subscribers(ids=telegram_subscribers)
-        log.debug('cubectl: main: watch: telegram messanger successfully configured.')
+        log.debug(
+            'cubectl: main: watch: telegram messanger successfully configured.'
+        )
     else:
-        log.warning('cubectl: main: watch: telegram messanger was not configured.')
+        log.warning(
+            f'cubectl: main: watch: telegram messanger was not '
+            f'configured because env variables was not supplied.\n'
+            f'CUBECTL_TELEGRAM_TOKEN={telegram_token}; CUBECTL_TELEGRAM_CHAT_IDS={telegram_subscribers}\n'
+        )
 
     try:
         status_file = get_status_file(
