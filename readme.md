@@ -11,8 +11,9 @@ Utility for starting and controlling processes in unix environments.
 [OPTIONAL] Update and install requirements if you need:
 ```bash
 sudo apt install python3-pip
+
 python -m pip install --upgrade pip
-pip install setuptools --upgrade
+python -m pip install setuptools --upgrade
 python -m pip install build
 ```
 [OPTIONAL] After installation of pip check that pip location added to PATH env variable:
