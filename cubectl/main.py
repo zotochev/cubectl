@@ -36,6 +36,7 @@ from cubectl.src.utils import (
 
 
 configurator = Configurator(config, app_register=register_location)
+executor: Executor = None
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__file__)
 dotenv.load_dotenv()
@@ -227,8 +228,7 @@ def handler_stop(signum, frame):
         log.info(f'cubectl: main: handling signal: stopping {app}.')
         stop_func(app, tuple())
 
-    wtime = os.getenv('CUBECTL_WATCHER_CHECK_PERIOD', 2)
-    time.sleep(int(wtime) + 1)
+    executor._stop_all_processes()
 
     sys.exit(0)
 
@@ -288,9 +288,12 @@ def watch(app_name, check):
 
     try:
         log.debug(f'cubectl: main: creating Executor for app: {app_name}, with arguments: {status_file=}; {app_name=}')
-        e = Executor(status_file=status_file, meta_info={'app': app_name})
-        e.add_messanger(m)
-        e.process(cycle_period=check)
+
+        global executor
+
+        executor = Executor(status_file=status_file, meta_info={'app': app_name})
+        executor.add_messanger(m)
+        executor.process(cycle_period=check)
     except ExecutorException as ee:
         log.error(f'Failed to start {app_name}. Error: {ee}')
 
