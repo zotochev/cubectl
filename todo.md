@@ -21,6 +21,8 @@
     - [x] calls `clean` command for all apps
     - [x] deletes `register`
 - [x] `kill` command to kill watcher in background
+  - [x] stop processes in configurator
+  - [x] stop processes in executor
 
 - [x] `get-apps` command
 - [x] redo register from dict to list
