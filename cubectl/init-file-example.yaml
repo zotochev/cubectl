@@ -5,34 +5,30 @@ tear_down_commands: []    # not implemented
 
 
 # There are two types of processes:
-#   service: requires port and nginx config
+#   service: requires port
 #   worker (service: false): only starts up
 
-# if `root_dir: null` location of this file is assumed as root directory
-# root_dir should be absolut (starts from eg: `/home/admin`) otherwise it ignored
-root_dir: null
-
-status_file_dir: /tmp/cubectl
-
 # each process follows InitProcessConfig
-# mandatory arguments are: name, executor, file
+# mandatory: name, executor, file
+# all path arguments (env-files, file argument, log)
+#   should be set up relatively to this file or have absolute path
 processes:
-  - name: service_0
+  - name: service_0         # this name will be used to identify process through cubectl cli command interface
 
-    executor: 'python'
-    file: 'tests/assets/example_services/example_service_0.py'
+    executor: python        # can be empty string
+    file: tests/assets/example_services/example_service_0.py
     arguments:
-      '--name': 'name_0'
+      '--name': name_0      # redirects ('>') and pipes ('|') will not work
 
-    environment:        # object of env variables
+    environment:            # object of env variables (overrides vars from files)
       FOO: 'BAR'
       ONE: 'ONE1'
-    env_files: []       # list of env files
-    dotenv: false       # if true (default true) tries to load .env file near command file
+    env_files: []           # list of env files
+    dotenv: false           # if true (default true) tries to load .env file near command file
 
-    service: true       # if true (default false) assigns port and nginx config
-    port: 1234
-    log: log0.log
+    service: true           # if true (default false) assigns port and nginx config
+    port: 1234              # used only for creating nginx config
+    log: log0.log           # file from which logs are going to be read
 
   - name: service_1
 
